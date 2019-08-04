@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProfileActivity"
+    android:background="@drawable/gradient_shape">
+
+
+ <View
+     android:layout_width="match_parent"
+     android:layout_height="200dp"
+     android:background="@drawable/fb_image">
+ </View>
+
+ <de.hdodenhof.circleimageview.CircleImageView
+     android:id="@+id/profile_Image"
+     android:layout_width="156dp"
+     android:layout_height="165dp"
+     android:layout_alignParentTop="true"
+     android:layout_centerHorizontal="true"
+     android:layout_marginTop="110dp"
+     android:src="@drawable/profile_image"
+     app:civ_border_width="2dp"
+     app:civ_border_color="#FF000000"
+     android:layout_below="@+id/setting_page_toolbar"/>
+
+ <TextView
+     android:id="@+id/profile_name"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:text="User Name"
+     android:textColor="@android:color/white"
+     android:layout_below="@id/profile_Image"
+     android:layout_marginLeft="15dp"
+     android:layout_marginRight="15dp"
+     android:layout_marginTop="5dp"
+     android:textAlignment="center"
+     android:textSize="20sp"
+     android:textStyle="bold"
+     android:elevation="22sp"
+     />
+
+ <TextView
+     android:id="@+id/profile_status"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:text="User Status"
+     android:textColor="@android:color/white"
+     android:layout_below="@id/profile_Image"
+     android:layout_marginLeft="15dp"
+     android:layout_marginRight="15dp"
+     android:layout_marginTop="25dp"
+     android:textAlignment="center"
+     android:textSize="18sp"
+     android:elevation="22sp"
+     />
+
+ <Button
+     android:id="@+id/send_message_btn"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_below="@id/profile_status"
+     android:layout_marginTop="15dp"
+     android:layout_marginLeft="65dp"
+     android:layout_marginRight="65dp"
+     android:textColor="@android:color/background_light"
+     android:textStyle="bold"
+     android:textSize="20sp"
+     android:text="Send Request"
+     android:background="@drawable/element_outline"
+     android:elevation="20dp"
+     />
+
+ <Button
+     android:id="@+id/decline_message_btn"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_below="@id/send_message_btn"
+     android:layout_marginTop="6dp"
+     android:layout_marginLeft="65dp"
+     android:layout_marginRight="65dp"
+     android:textColor="@android:color/background_light"
+     android:textStyle="bold"
+     android:textSize="20sp"
+     android:text="Decline Request"
+     android:visibility="visible"
+     android:background="@drawable/element_outline"/>
+
+
+</RelativeLayout>

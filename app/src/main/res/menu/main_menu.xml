@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/main_menu_Users"
+        android:title="Find Friend" />
+    <item
+        android:id="@+id/main_menu_Group"
+        android:title="Create Group" />
+    <item
+        android:id="@+id/main_menu_account"
+        android:title="Account Setting" />
+    <item
+        android:id="@+id/main_menu_logout"
+        android:title="Logout" />
+</menu>

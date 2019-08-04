@@ -1,0 +1,65 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.example.chatify"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.0-beta01'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
+    implementation 'com.google.firebase:firebase-messaging:17.3.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+    implementation 'androidx.core:core:1.0.0'
+
+
+    implementation 'com.google.android.material:material:1.0.0-beta01'
+
+    implementation 'com.google.firebase:firebase-database:16.0.6'
+    implementation 'com.google.firebase:firebase-auth:16.1.0'
+    implementation 'com.google.firebase:firebase-storage:16.0.5'
+    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
+
+
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
+//    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    implementation 'id.zelory:compressor:2.1.0'
+
+    //for firebase offline
+    implementation 'com.squareup.okhttp3:okhttp:3.6.0'
+
+    //
+    implementation 'com.github.shts:StoriesProgressView:3.0.0'
+
+    implementation 'com.firebaseui:firebase-ui-database:4.3.1'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+
+    implementation "androidx.lifecycle:lifecycle-extensions:2.0.0"
+
+
+}
+apply plugin: 'com.google.gms.google-services'

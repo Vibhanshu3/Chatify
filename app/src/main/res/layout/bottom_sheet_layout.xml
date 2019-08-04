@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <TextView
+        android:id="@+id/bottom_sheet_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter your name"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="22dp"/>
+
+    <EditText
+        android:id="@+id/bottom_sheet_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bottom_sheet_heading"
+        android:inputType="textPersonName"
+        android:ems="15"
+        android:layout_margin="22dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bottom_sheet_text"
+        android:orientation="horizontal"
+        android:layout_marginStart="200dp">
+
+        <Button
+            android:id="@+id/bottom_sheet_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CANCEL"
+            android:background="@android:color/white"
+            android:textColor="@color/colorPrimary"
+            android:layout_gravity="right|end"/>
+
+        <Button
+            android:id="@+id/bottom_sheet_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SAVE"
+            android:background="@android:color/white"
+            android:textColor="@color/colorPrimary"
+            android:layout_gravity="right|end"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
