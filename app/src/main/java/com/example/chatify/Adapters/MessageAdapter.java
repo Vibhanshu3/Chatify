@@ -3,6 +3,7 @@ package com.example.chatify.Adapters;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     public MessageAdapter(List<Messages> userMessagesList){
         this.userMessagesList = userMessagesList;
+        setHasStableIds(true);
+
     }
 
     @NonNull
@@ -105,15 +108,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 holder.receiverText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
 
             }
-        } else if (fromMesstype.equals("image")) {
+        } else if(fromMesstype.equals("image")) {
             if (fromUserId.equals(currUser)) {
+                Log.d("incurr", "onBindViewHolder: " + "incurr");
                 holder.messageSenderPicture.setVisibility(View.VISIBLE);
                 Picasso.get().load(messages.getMessage()).into(holder.messageSenderPicture);
 
             }else{
+                Log.d("inrec", "onBindViewHolder: " + "inrec");
+
                 holder.messageReceiverPicture.setVisibility(View.VISIBLE);
-                holder.messageSenderPicture.setVisibility(View.VISIBLE);
-                Picasso.get().load(messages.getMessage()).into(holder.messageReceiverPicture);
+                holder.userImage.setVisibility(View.VISIBLE);
+                Picasso.get().load(messages.getMessage()).placeholder(R.drawable.profile_image).into(holder.messageReceiverPicture);
 
             }
         }else {

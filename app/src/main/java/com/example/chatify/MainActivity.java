@@ -202,14 +202,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        if(user!=null){
-//            updateUserStatus("Offline");
-//
-//        }
-//    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(user!=null){
+            updateUserStatus("Offline");
+
+        }
+    }
 
     private void verifyUserExistance() {
         currentUser = mauth.getCurrentUser().getUid();

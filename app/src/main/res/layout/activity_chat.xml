@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ChatActivity"
-    android:background="@android:color/darker_gray">
+    android:background="@android:color/white">
 
     <include
         android:id="@+id/chat_toolbar"
@@ -17,7 +17,8 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/chat_toolbar"
         android:layout_above="@+id/chat_linear_layout"
-        android:layout_marginBottom="6dp">
+        android:layout_marginBottom="6dp"
+        android:backgroundTint="@android:color/white">
 
     </androidx.recyclerview.widget.RecyclerView>
 

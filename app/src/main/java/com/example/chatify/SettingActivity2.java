@@ -236,54 +236,8 @@ public class SettingActivity2 extends AppCompatActivity {
                     }
                 });
     }
-//
-//    public boolean validateName() {
-//
-//        String userName = settingName.getEditText().getText().toString();
-//
-//        if (userName.isEmpty()) {
-//            settingName.setError("Field can't be empty");
-//            return false;
-//        } else {
-//            settingName.setError(null);
-//            return true;
-//        }
-//    }
-//
-//    public void Continue(View view) {
-//        settingProgBar.setVisibility(View.VISIBLE);
-//        if (!validateName()) {
-//            settingProgBar.setVisibility(View.INVISIBLE);
-//            return;
-//        }
-//
-//        String username = settingName.getEditText().getText().toString();
-//        String status = settingStatus.getEditText().getText().toString();
-//
-//        databaseReference.child("User").child(currUserID).child("User_Status").setValue(status);
-//        // databaseReference.child("User Image").setValue(R.drawable.default_image);
-//        databaseReference.child("User").child(currUserID).child("User_Name").setValue(username)
-//                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//
-//                        if (task.isSuccessful()) {
-//
-//                            settingProgBar.setVisibility(View.INVISIBLE);
-//                            Intent intent = new Intent(com.example.chatify.SettingActivity.this, MainActivity.class);
-//                            //  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                            startActivity(intent);
-//                            finish();
-//
-//                        } else {
-//                            String error = task.getException().toString();
-//                            Toast.makeText(com.example.chatify.SettingActivity.this, "Error : " + error, Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                });
-//
-//    }
-//
+
+
     public void camera(View view) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

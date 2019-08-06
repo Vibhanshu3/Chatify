@@ -159,28 +159,31 @@ public class ChatActivity extends AppCompatActivity {
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_GET_CONTENT);
                             intent.setType("image/*");
-                            startActivityForResult(intent.createChooser(intent, "Select Images"), 438);
+                            startActivityForResult(intent.createChooser(intent, "Select Image"), 438);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                         }
-
                         if(which == 1){
                             checker = "pdf";
 
+                            //send to file manager.
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_GET_CONTENT);
                             intent.setType("application/*");
                             startActivityForResult(intent.createChooser(intent, "Select PDF file"), 438);
-
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                         }
 
                         if(which == 2){
                             checker = "docx";
 
+                            //send to file manager.
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_GET_CONTENT);
                             intent.setType("application/*");
                             startActivityForResult(intent.createChooser(intent, "Select Ms word file"), 438);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                         }
                     }
@@ -203,6 +206,7 @@ public class ChatActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(messageAdapter);
 
+
         displayLastSeen();
     }
 
@@ -212,7 +216,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("hi", "onActivityResult: "+"hi");
 
-        if(requestCode == 438 && requestCode==RESULT_OK && data!=null && data.getData()!=null){
+        if(requestCode == 438 && resultCode == RESULT_OK && data != null && data.getData() != null){
             Log.d("forimage", "onActivityResult: "+"forimage");
             loadingBar .setTitle("Sending File");
             loadingBar.setMessage("Please wait, for a while");
@@ -291,7 +295,7 @@ public class ChatActivity extends AppCompatActivity {
 
                             my_Url = downloadUri.toString();
 
-                            //store image into firebase Database
+                            //store docx into firebase Database
                             Map messageImageBody = new HashMap();
                             messageImageBody.put("message", my_Url);
                             messageImageBody.put("name", fileUri.getLastPathSegment());
@@ -335,8 +339,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
             }else if(checker.equals("image")){
-                Log.d("inimage", "onActivityResult: "+"inimage");
-
+                Log.d("inimage", "onActivityResult: "+ "inimage");
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                         .child("Image Files");
 
@@ -395,8 +398,6 @@ public class ChatActivity extends AppCompatActivity {
                                         loadingBar.dismiss();
 
                                     }
-
-                                   // messageInputText.setText(null);
                                 }
                             });
 
@@ -462,6 +463,16 @@ public class ChatActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        messageList.clear();
+        messageAdapter.notifyDataSetChanged();
+
+        messageAdapter = new MessageAdapter(messageList);
+        recyclerView.setAdapter(messageAdapter);
+
+    }
 
     @Override
     protected void onStart() {
@@ -471,10 +482,10 @@ public class ChatActivity extends AppCompatActivity {
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                         Messages message = dataSnapshot.getValue(Messages.class);
                         messageList.add(message);
                         messageAdapter.notifyDataSetChanged();
-
                         recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount());
 
                     }
