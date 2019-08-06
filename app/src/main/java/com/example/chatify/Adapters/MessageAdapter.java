@@ -1,9 +1,12 @@
 package com.example.chatify.Adapters;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,22 +53,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MessageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final MessageViewHolder holder, final int position) {
 
         currUser = mauth.getCurrentUser().getUid();  // message senderID
 
         Messages messages = userMessagesList.get(position);
 
-        String fromUSerId = messages.getFrom();
+        String fromUserId = messages.getFrom();
         String fromMesstype = messages.getType();
 
-        userReference = FirebaseDatabase.getInstance().getReference().child("User").child(fromUSerId);
+        userReference = FirebaseDatabase.getInstance().getReference().child("User").child(fromUserId);
 
         userReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                if(dataSnapshot.hasChild("User_Image")){
+                if (dataSnapshot.hasChild("User_Image")) {
                     String receiverImage = dataSnapshot.child("User_Image").getValue().toString();
 
                     Picasso.get().load(receiverImage).placeholder(R.drawable.default_image).into(holder.userImage);
@@ -78,46 +81,71 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
         });
 
-        if(fromMesstype.equals("text")){
+        holder.receiverText.setVisibility(View.GONE);
+        holder.userImage.setVisibility(View.GONE);
+        holder.senderText.setVisibility(View.GONE);
+        holder.messageSenderPicture.setVisibility(View.GONE);
+        holder.messageReceiverPicture.setVisibility(View.GONE);
 
-            holder.receiverText.setVisibility(View.INVISIBLE);
-            holder.userImage.setVisibility(View.INVISIBLE);
-            holder.senderText.setVisibility(View.INVISIBLE);
+        if (fromMesstype.equals("text")) {
 
+            if (fromUserId.equals(currUser)) {
 
-            if(fromUSerId.equals(currUser)){
+                holder.senderText.setVisibility(View.VISIBLE);
 
-                  holder.senderText.setVisibility(View.VISIBLE);
-
-                  holder.senderText.setBackgroundResource(R.drawable.sender_messages_layout);
-                  holder.senderText.setTextColor(Color.BLACK);
-                  holder.senderText.setText(messages.getMessage());
-            }else{
+                holder.senderText.setBackgroundResource(R.drawable.sender_messages_layout);
+                holder.senderText.setTextColor(Color.BLACK);
+                holder.senderText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+            } else {
                 holder.receiverText.setVisibility(View.VISIBLE);
                 holder.userImage.setVisibility(View.VISIBLE);
 
                 holder.receiverText.setBackgroundResource(R.drawable.receiver_messages_layout);
                 holder.receiverText.setTextColor(Color.BLACK);
-                holder.receiverText.setText(messages.getMessage());
+                holder.receiverText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
 
             }
+        } else if (fromMesstype.equals("image")) {
+            if (fromUserId.equals(currUser)) {
+                holder.messageSenderPicture.setVisibility(View.VISIBLE);
+                Picasso.get().load(messages.getMessage()).into(holder.messageSenderPicture);
+
+            }else{
+                holder.messageReceiverPicture.setVisibility(View.VISIBLE);
+                holder.messageSenderPicture.setVisibility(View.VISIBLE);
+                Picasso.get().load(messages.getMessage()).into(holder.messageReceiverPicture);
+
+            }
+        }else {
+            if (fromUserId.equals(currUser)) {
+                holder.messageSenderPicture.setVisibility(View.VISIBLE);
+                holder.messageSenderPicture.setBackgroundResource(R.drawable.file);
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessagesList.get(position).getMessage()));
+                        holder.itemView.getContext().startActivity(intent);
+
+                    }
+                });
+
+            }else{
+                holder.messageReceiverPicture.setVisibility(View.VISIBLE);
+                holder.messageSenderPicture.setVisibility(View.VISIBLE);
+
+                holder.messageReceiverPicture.setBackgroundResource(R.drawable.file);
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessagesList.get(position).getMessage()));
+                        holder.itemView.getContext().startActivity(intent);
+
+                    }
+                });
+            }
         }
-       /* if(fromUSerId.equals(currUser)){
-
-            holder.messageText.setBackgroundResource(R.drawable.message_text_background_two);
-
-            holder.messageText.setGravity(Gravity.RIGHT);
-
-            holder.messageText.setTextColor(Color.BLACK);
-        }else{
-            holder.messageText.setBackgroundResource(R.drawable.message_text_background);
-
-            holder.messageText.setGravity(Gravity.LEFT);
-
-            holder.messageText.setTextColor(Color.WHITE);
-
-        }
-        holder.messageText.setText(messages.getMessage());*/
     }
 
     @Override
@@ -130,6 +158,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         public TextView receiverText,senderText;
         public CircleImageView userImage;
+        public ImageView messageSenderPicture, messageReceiverPicture;
 
         public MessageViewHolder(View view){
 
@@ -138,6 +167,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             receiverText = view.findViewById(R.id.receiver_message_text);
             senderText = view.findViewById(R.id.sender_message_text);
             userImage = view.findViewById(R.id.message_profile_image);
+            messageReceiverPicture = view.findViewById(R.id.message_receiver_image);
+            messageSenderPicture = view.findViewById(R.id.message_sender_image);
 
         }
 

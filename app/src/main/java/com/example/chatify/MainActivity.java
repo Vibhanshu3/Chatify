@@ -4,30 +4,37 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningAppProcessInfo;
-import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
-import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.chatify.Adapters.SearchAdapter;
 import com.example.chatify.Adapters.TabsAccessorAdapter;
+import com.example.chatify.Data.AllUsers;
+import com.example.chatify.Fragments.ChatsFragment;
 import com.example.chatify.Login.LoginActivity;
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
@@ -37,13 +44,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private Toolbar mtoolbar;
     private ViewPager myViewPager;
@@ -55,7 +68,12 @@ public class MainActivity extends AppCompatActivity {
     String currentUser;
     FirebaseUser user;
     int flag = 0;
-    int flag2 = 0;boolean isInBackground;
+
+    List<String> list;
+    private SearchAdapter searchAdapter;
+
+    private RecyclerView userRecView;
+    int tag =0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,33 +84,77 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mtoolbar);
         getSupportActionBar().setTitle("Chatify");
 
-        myViewPager = findViewById(R.id.main_tabs_pager);
-        myTabsAccessorAdapter = new TabsAccessorAdapter(getSupportFragmentManager());
-        myViewPager.setAdapter(myTabsAccessorAdapter);
+        if(tag == 0) {
+            myViewPager = findViewById(R.id.main_tabs_pager);
+            myTabsAccessorAdapter = new TabsAccessorAdapter(getSupportFragmentManager());
+            myViewPager.setAdapter(myTabsAccessorAdapter);
 
-        myTabLayout = findViewById(R.id.main_tabs);
-        myTabLayout.setupWithViewPager(myViewPager);
+            myTabLayout = findViewById(R.id.main_tabs);
+            myTabLayout.setupWithViewPager(myViewPager);
+        }
+
+            userRecView = findViewById(R.id.user_rec_view);
+            userRecView.setHasFixedSize(true);
+            userRecView.setLayoutManager(new LinearLayoutManager(this));
+
+            searchAdapter = new SearchAdapter(MainActivity.this, list);
+            userRecView.setAdapter(searchAdapter);
+
 
         mauth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         user = mauth.getCurrentUser();
 
-        if(user != null){
+
+
+
+
+
+
+        list = new ArrayList<>();
+
+        if (user != null) {
             updateUserStatus("Online");
+
+            databaseReference.child("Contacts").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Log.e("Count " ,""+dataSnapshot.getChildrenCount());
+                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                         String contactID = postSnapshot.getRef().getKey();
+                        Log.d("getData", "onDataChange: "+ postSnapshot.getRef());
+
+                        databaseReference.child("User").child(contactID).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                String username = dataSnapshot.child("User_Name").getValue().toString();
+                                Log.d("username", "onDataChange:  " + username);
+                                list.add(username);
+                                Log.d("list", "onDataChange:  " + list);
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e("The read failed: " ,databaseError.getMessage());
+
+                }
+            });
+
         }
 
-        RunningAppProcessInfo myProcess = new RunningAppProcessInfo();
-        ActivityManager.getMyMemoryState(myProcess);
-        isInBackground = myProcess.importance != RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
-        if(isInBackground) {
-            Log.d("Tutorialspoint.com","Your application is in background state");
-        }else{
-            Log.d("Tutorialspoint.com","application is in forground state");
+        Log.d("listuser", "onCreate: " + list);
 
-        }
 
     }
-
 
 
     @Override
@@ -100,18 +162,18 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         Log.d("main", "onStart: " + currentUser);
 
-        if(user == null){
+        if (user == null) {
             Log.d("user", "onStart: " + "null");
             sendUserToLoginActivity();
-           // currentUser = mauth.getCurrentUser().getUid();
-        }else {
+            // currentUser = mauth.getCurrentUser().getUid();
+        } else {
 
             updateUserStatus("Online");
 
             Log.d("main", "onStart: " + "in main");
             verifyUserExistance();
         }
-     //   Log.d("main", "onStart: " + currentUser);
+        //   Log.d("main", "onStart: " + currentUser);
     }
 
     @Override
@@ -124,14 +186,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        Log.d("sttp", "onUserLeaveHint: "+"sttp");
-        if(user!=null){
-            if(flag == 0) {
+        Log.d("sttp", "onUserLeaveHint: " + "sttp");
+        if (user != null) {
+            if (flag == 0) {
                 updateUserStatus("Offline");
                 Log.d("see", "onStop: " + "see");
 
-            }
-            else{
+            } else {
                 Log.d("stop", "onStop: " + flag);
                 updateUserStatus("Online");
                 flag = 0;
@@ -139,9 +200,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
-
 
 
 //    @Override
@@ -154,15 +212,15 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     private void verifyUserExistance() {
-       currentUser = mauth.getCurrentUser().getUid();
+        currentUser = mauth.getCurrentUser().getUid();
 
         databaseReference.child("User").child(currentUser).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("User_Name").exists()){
+                if (dataSnapshot.child("User_Name").exists()) {
                     Log.d("check", "onDataChange: " + "check");
                     Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     Toast.makeText(MainActivity.this, "Go to settings", Toast.LENGTH_SHORT).show();
                     sendUserToSettingActivity();
                 }
@@ -180,6 +238,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.main_menu_search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+
         return true;
     }
 
@@ -187,6 +250,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+
+            case R.id.main_menu_search:
+                tag=1;
+                return true;
+
             case R.id.main_menu_logout:
                 logout();
                 updateUserStatus("Offline");
@@ -198,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.main_menu_Users:
-                Intent intent1 = new Intent(MainActivity.this,AllUserActivity.class);
+                Intent intent1 = new Intent(MainActivity.this, AllUserActivity.class);
                 startActivity(intent1);
                 flag = 1;
                 return true;
@@ -226,9 +294,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String groupName = groupNameField.getText().toString();
-                if(TextUtils.isEmpty(groupName)){
+                if (TextUtils.isEmpty(groupName)) {
                     Toast.makeText(MainActivity.this, "Plz write group name", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     creatNewGroup(groupName);
                 }
             }
@@ -241,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        
+
         builder.show();
     }
 
@@ -250,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             Toast.makeText(MainActivity.this, "Group is created", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -284,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateUserStatus(String state){
+    private void updateUserStatus(String state) {
 
         String saveCurrTime, saveCurrDate;
 
@@ -307,8 +375,40 @@ public class MainActivity extends AppCompatActivity {
                 .updateChildren(onlineState);
 
 
-
     }
 
+//    public void updateList(List<String> newList){
+//        name = new ArrayList<>();
+//        names.addAll(newList);
+//        notifyDataSetChanged();
+//    }
+
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        String userInput = newText.toLowerCase();
+        Log.d("list", "onQueryTextChange: " + list);
+        Log.d("userinput", "onQueryTextChange: " + userInput);
+        List<String> newList = new ArrayList<>();
+
+        for(String names : list){
+            if(names.toLowerCase().contains(userInput)){
+                newList.add(names);
+            }
+        }
+        Log.d("newlist", "onQueryTextChange: " + newList);
+
+        searchAdapter.updateList(newList);
+
+
+        return true;
+    }
 
 }
+
+

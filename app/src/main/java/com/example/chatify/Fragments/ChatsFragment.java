@@ -5,15 +5,20 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,15 +32,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatsFragment extends Fragment {
+public class ChatsFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     private View privateChatsView;
     private RecyclerView chatsRecView;
@@ -44,10 +53,11 @@ public class ChatsFragment extends Fragment {
     private FirebaseAuth mAuth;
     private String curruserID;
 
-    public ChatsFragment() {
-        // Required empty public constructor
-    }
+    private List<AllUsers> list;
 
+    public ChatsFragment(){
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,6 +72,8 @@ public class ChatsFragment extends Fragment {
         curruserID = mAuth.getCurrentUser().getUid();
         chatsReference = FirebaseDatabase.getInstance().getReference().child("Contacts").child(curruserID);
         userReference = FirebaseDatabase.getInstance().getReference().child("User");
+
+        list = new ArrayList<>();
 
         return privateChatsView;
     }
@@ -98,10 +110,16 @@ public class ChatsFragment extends Fragment {
 
 //                      Toast.makeText(getContext(), "hi", Toast.LENGTH_SHORT).show();
 
+                        AllUsers user = new AllUsers();
+
                         if(dataSnapshot.exists()){
                             if(dataSnapshot.hasChild("User_Image")){
                                 image[0] = dataSnapshot.child("User_Image").getValue().toString();
                                 Picasso.get().load(image[0]).placeholder(R.drawable.default_image).into(allUserViewHolder.userImage);
+
+                                user.setUser_Image(image[0]);
+
+
                             }
 
                             final String name = dataSnapshot.child("User_Name").getValue().toString();
@@ -109,6 +127,10 @@ public class ChatsFragment extends Fragment {
 
                             allUserViewHolder.userName.setText(name);
                             allUserViewHolder.userStatus.setText("Last Seen" + "\n" + "Date" + "Time");
+
+                            user.setUser_Name(name);
+
+                            list.add(user);
 
 
                             if(dataSnapshot.child("User_State").hasChild("State"))
@@ -160,6 +182,16 @@ public class ChatsFragment extends Fragment {
         adapter.startListening();
     }
 
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
     public static class AllUserViewHolder extends RecyclerView.ViewHolder{
 
         View mview;
@@ -177,4 +209,6 @@ public class ChatsFragment extends Fragment {
             online_status = itemView.findViewById(R.id.online_user);
         }
     }
+
+
 }
