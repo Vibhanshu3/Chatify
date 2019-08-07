@@ -85,7 +85,7 @@
      android:textStyle="bold"
      android:textSize="20sp"
      android:text="Decline Request"
-     android:visibility="visible"
+     android:visibility="invisible"
      android:background="@drawable/element_outline"/>
 
 

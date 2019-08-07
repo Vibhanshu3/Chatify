@@ -109,11 +109,9 @@ public class RequestFragment extends Fragment {
 
                                                 }
                                                 final String name = dataSnapshot.child("User_Name").getValue().toString();
-                                                String status = dataSnapshot.child("User_Status").getValue().toString();
 
                                                 requestViewHolder.userName.setText(name);
                                                 requestViewHolder.userStatus.setText("wants to cnnect with you");
-
 
                                                 requestViewHolder.accept.setOnClickListener(new View.OnClickListener() {
                                                     @Override
@@ -262,6 +260,55 @@ public class RequestFragment extends Fragment {
 //
 //                                                    }
 //                                                });
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                    }else{
+                                        requestViewHolder.accept.setText("Cancel Sent Request");
+                                        requestViewHolder.cancel.setVisibility(View.INVISIBLE);
+
+
+                                        userReference.child(userIDs).addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.hasChild("User_Image")) {
+                                                    String image = dataSnapshot.child("User_Image").getValue().toString();
+                                                    Picasso.get().load(image).placeholder(R.drawable.default_image).into(requestViewHolder.userImage);
+
+                                                }
+                                                final String name = dataSnapshot.child("User_Name").getValue().toString();
+
+                                                requestViewHolder.userName.setText(name);
+                                                requestViewHolder.userStatus.setText("Your req has been send");
+
+                                                requestViewHolder.accept.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        chatRequestReference.child(currUserID).child(userIDs).removeValue()
+                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                            chatRequestReference.child(userIDs).child(currUserID).removeValue()
+                                                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                                            if (task.isSuccessful()) {
+                                                                                                Toast.makeText(getContext(), "Contact Request Declined", Toast.LENGTH_SHORT).show();
+                                                                                            }
+                                                                                        }
+                                                                                    });
+                                                                        }
+                                                                    }
+                                                                });
+
+
+                                                    }
+                                                });
                                             }
 
                                             @Override

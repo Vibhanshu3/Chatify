@@ -203,9 +203,9 @@ public class ChatActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.private_message_rec_view);
         messageAdapter = new MessageAdapter(messageList);
         linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(messageAdapter);
-
 
         displayLastSeen();
     }
@@ -416,6 +416,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void displayLastSeen() {
 
+        //setting user online state.
         databaseReference.child("User").child(messageSenderID).child("User_State").child("State")
                 .setValue("Online")
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

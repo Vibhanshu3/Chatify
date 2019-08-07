@@ -39,7 +39,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     public MessageAdapter(List<Messages> userMessagesList){
         this.userMessagesList = userMessagesList;
-        setHasStableIds(true);
 
     }
 
@@ -84,22 +83,33 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
         });
 
-        holder.receiverText.setVisibility(View.GONE);
-        holder.userImage.setVisibility(View.GONE);
-        holder.senderText.setVisibility(View.GONE);
-        holder.messageSenderPicture.setVisibility(View.GONE);
-        holder.messageReceiverPicture.setVisibility(View.GONE);
+//        holder.receiverText.setVisibility(View.INVISIBLE);
+//        holder.userImage.setVisibility(View.INVISIBLE);
+//        holder.senderText.setVisibility(View.INVISIBLE);
+//        holder.messageSenderPicture.setVisibility(View.GONE);
+//        holder.messageReceiverPicture.setVisibility(View.GONE);
 
         if (fromMesstype.equals("text")) {
+            Log.d("text", "onBindViewHolder: " + "text");
+
+            holder.receiverText.setVisibility(View.INVISIBLE);
+            holder.userImage.setVisibility(View.INVISIBLE);
+            holder.senderText.setVisibility(View.INVISIBLE);
+            holder.messageSenderPicture.setVisibility(View.GONE);
+            holder.messageReceiverPicture.setVisibility(View.GONE);
 
             if (fromUserId.equals(currUser)) {
+                Log.d("incurr", "onBindViewHolder: " + "text");
 
                 holder.senderText.setVisibility(View.VISIBLE);
 
                 holder.senderText.setBackgroundResource(R.drawable.sender_messages_layout);
                 holder.senderText.setTextColor(Color.BLACK);
                 holder.senderText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+
             } else {
+                Log.d("inrec", "onBindViewHolder: " + "text");
+
                 holder.receiverText.setVisibility(View.VISIBLE);
                 holder.userImage.setVisibility(View.VISIBLE);
 
@@ -109,6 +119,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             }
         } else if(fromMesstype.equals("image")) {
+            holder.receiverText.setVisibility(View.INVISIBLE);
+            holder.userImage.setVisibility(View.INVISIBLE);
+            holder.senderText.setVisibility(View.INVISIBLE);
+            holder.messageSenderPicture.setVisibility(View.INVISIBLE);
+            holder.messageReceiverPicture.setVisibility(View.INVISIBLE);
+
+            Log.d("image", "onBindViewHolder: " + "image");
+
             if (fromUserId.equals(currUser)) {
                 Log.d("incurr", "onBindViewHolder: " + "incurr");
                 holder.messageSenderPicture.setVisibility(View.VISIBLE);
