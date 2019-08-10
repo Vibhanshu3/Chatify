@@ -2,5 +2,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="app_name">Chatify</string>
+    <string name="drawer_open">Drawer Open</string>
+    <string name="drawer_close">Drawer Close</string>
 
 </resources>

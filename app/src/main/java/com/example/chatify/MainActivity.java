@@ -1,12 +1,15 @@
 package com.example.chatify;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -63,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private TabLayout myTabLayout;
     private TabsAccessorAdapter myTabsAccessorAdapter;
 
+    private ActionBarDrawerToggle drawerToggle;
+    private DrawerLayout drawerLayout;
+
     FirebaseAuth mauth;
     private DatabaseReference databaseReference;
     String currentUser;
@@ -83,6 +90,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         mtoolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mtoolbar);
         getSupportActionBar().setTitle("Chatify");
+
+        drawerLayout = findViewById(R.id.main_layout);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, mtoolbar, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.addDrawerListener(drawerToggle);
+
+        drawerLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                drawerToggle.syncState();
+            }
+        });
+
 
         if(tag == 0) {
             myViewPager = findViewById(R.id.main_tabs_pager);
@@ -156,6 +175,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     }
 
+//    @Override
+//    public void onPostCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+//        super.onPostCreate(savedInstanceState, persistentState);
+//        drawerToggle.syncState();
+//
+//
+//    }
 
     @Override
     public void onStart() {
