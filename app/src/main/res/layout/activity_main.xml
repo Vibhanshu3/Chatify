@@ -54,18 +54,23 @@
 
     <!--for navigation-->
     <LinearLayout
-        android:layout_width="270dp"
+        android:layout_width="120dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:orientation="vertical"
-        android:background="@android:color/black">
+        android:background="@drawable/gradient_shape">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/navigation_rec_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
         </androidx.recyclerview.widget.RecyclerView>
+
+        <include
+            android:id="@+id/create_group_navigation_btn"
+            layout="@layout/custom_navigation_layout">
+        </include>
 
     </LinearLayout>
 

@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,9 +32,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.chatify.Adapters.NavigationAdapter;
 import com.example.chatify.Adapters.SearchAdapter;
+import com.example.chatify.Adapters.StoryAdapter;
 import com.example.chatify.Adapters.TabsAccessorAdapter;
 import com.example.chatify.Data.AllUsers;
+import com.example.chatify.Data.Group;
 import com.example.chatify.Fragments.ChatsFragment;
 import com.example.chatify.Login.LoginActivity;
 import com.firebase.ui.auth.AuthUI;
@@ -57,8 +61,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.zip.Inflater;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -67,8 +74,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private TabLayout myTabLayout;
     private TabsAccessorAdapter myTabsAccessorAdapter;
 
+    //navigation drawer.
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
+    private RecyclerView navRexView;
+    private CircleImageView groupAddImage;
+    private NavigationAdapter navigationAdapter;
+    private List<Group> groupList;
 
     FirebaseAuth mauth;
     private DatabaseReference databaseReference;
@@ -91,16 +103,40 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         setSupportActionBar(mtoolbar);
         getSupportActionBar().setTitle("Chatify");
 
+        //setting navigation drawer.
         drawerLayout = findViewById(R.id.main_layout);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, mtoolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
-
         drawerLayout.post(new Runnable() {
             @Override
             public void run() {
                 drawerToggle.syncState();
             }
         });
+        navRexView = findViewById(R.id.navigation_rec_view);
+
+        View view;
+        LayoutInflater inflater = (LayoutInflater)getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view = inflater.inflate(R.layout.custom_navigation_layout, null);
+        groupAddImage = view.findViewById(R.id.group_image);
+        groupAddImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("groupimage", "onClick: " + "group");
+                requestNewGroup();
+
+            }
+        });
+
+        navRexView = findViewById(R.id.navigation_rec_view);
+        groupList = new ArrayList<>();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        navRexView.setLayoutManager(linearLayoutManager);
+        navigationAdapter = new NavigationAdapter(groupList);
+        navRexView.setAdapter(navigationAdapter);
+        navRexView.setHasFixedSize(true);
+
+
 
 
         if(tag == 0) {
@@ -110,8 +146,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
             myTabLayout = findViewById(R.id.main_tabs);
             myTabLayout.setupWithViewPager(myViewPager);
-        }
 
+        }
             userRecView = findViewById(R.id.user_rec_view);
             userRecView.setHasFixedSize(true);
             userRecView.setLayoutManager(new LinearLayoutManager(this));
@@ -124,17 +160,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         databaseReference = FirebaseDatabase.getInstance().getReference();
         user = mauth.getCurrentUser();
 
-
-
-
-
-
-
         list = new ArrayList<>();
 
         if (user != null) {
             updateUserStatus("Online");
 
+            //for search.
             databaseReference.child("Contacts").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -175,13 +206,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     }
 
-//    @Override
-//    public void onPostCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-//        super.onPostCreate(savedInstanceState, persistentState);
-//        drawerToggle.syncState();
-//
-//
-//    }
 
     @Override
     public void onStart() {
@@ -311,9 +335,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
         builder.setTitle("Enter Group Name");
 
-
         final EditText groupNameField = new EditText(this);
-        groupNameField.setHint("Coding");
+        groupNameField.setHint("Your Group Name");
 
         builder.setView(groupNameField);
         builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
@@ -321,14 +344,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             public void onClick(DialogInterface dialog, int which) {
                 String groupName = groupNameField.getText().toString();
                 if (TextUtils.isEmpty(groupName)) {
-                    Toast.makeText(MainActivity.this, "Plz write group name", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Group name is blank", Toast.LENGTH_SHORT).show();
                 } else {
-                    creatNewGroup(groupName);
+                    Group group = new Group();
+                    group.setGroup_Name(groupName);
+                    groupList.add(group);
+
+                    createNewGroup(groupName);
                 }
             }
         });
 
-        builder.setNegativeButton("Create", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -339,13 +366,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         builder.show();
     }
 
-    private void creatNewGroup(String groupName) {
-        databaseReference.child("Groups").child(groupName).setValue("")
+    private void createNewGroup(String groupName) {
+        databaseReference.child("Groups").child(groupName).child("Group_Name").setValue(groupName)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "Group is created", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Group successfully created", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
