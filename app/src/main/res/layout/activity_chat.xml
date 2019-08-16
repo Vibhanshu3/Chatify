@@ -34,7 +34,7 @@
         android:backgroundTint="@color/colorPrimary"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab3"
+        android:id="@+id/fab_pdf"
         android:layout_width="@dimen/standard_45"
         android:layout_height="@dimen/standard_45"
         android:layout_gravity="bottom|start"
@@ -45,7 +45,7 @@
         android:backgroundTint="@color/colorPrimary"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab2"
+        android:id="@+id/fab_gallery"
         android:layout_width="@dimen/standard_45"
         android:layout_height="@dimen/standard_45"
         android:layout_gravity="bottom|start"

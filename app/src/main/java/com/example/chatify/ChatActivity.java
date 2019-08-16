@@ -1,5 +1,20 @@
 package com.example.chatify;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -8,24 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Message;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.chatify.Adapters.MessageAdapter;
 import com.example.chatify.Data.Messages;
@@ -43,13 +40,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,16 +72,16 @@ public class ChatActivity extends AppCompatActivity {
     private MessageAdapter messageAdapter;
     private RecyclerView recyclerView;
 
-   private String saveCurrTime, saveCurrDate;
+    private String saveCurrTime, saveCurrDate;
 
-   private String checker = "", my_Url = "";
-   private StorageTask uploadTask;
-   private Uri fileUri;
-   private ProgressDialog loadingBar;
+    private String checker = "", my_Url = "";
+    private StorageTask uploadTask;
+    private Uri fileUri;
+    private ProgressDialog loadingBar;
 
-   private FloatingActionButton fab1;
-    private FloatingActionButton fab2;
-    private FloatingActionButton fab3;
+    private FloatingActionButton fab1;
+    private FloatingActionButton fab_gallery;
+    private FloatingActionButton fab_pdf;
     private Boolean isFABOpen;
 
 
@@ -147,9 +140,9 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 CharSequence options[] = new CharSequence[]
                         {
-                            "Images",
-                            "PDF Files",
-                            "Ms word Files"
+                                "Images",
+                                "PDF Files",
+                                "Ms word Files"
                         };
                 AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
                 builder.setTitle("Select the files");
@@ -157,7 +150,7 @@ public class ChatActivity extends AppCompatActivity {
                 builder.setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if(which == 0){
+                        if (which == 0) {
                             checker = "image";
 
                             //send to phone gallery
@@ -168,7 +161,7 @@ public class ChatActivity extends AppCompatActivity {
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                         }
-                        if(which == 1){
+                        if (which == 1) {
                             checker = "pdf";
 
                             //send to file manager.
@@ -180,7 +173,7 @@ public class ChatActivity extends AppCompatActivity {
 
                         }
 
-                        if(which == 2){
+                        if (which == 2) {
                             checker = "docx";
 
                             //send to file manager.
@@ -214,55 +207,86 @@ public class ChatActivity extends AppCompatActivity {
 
         //setting floating action btn.
         isFABOpen = false;
-        FloatingActionButton fab =  findViewById(R.id.fab);
-        fab1 =  findViewById(R.id.fab1);
-        fab2 =  findViewById(R.id.fab2);
-        fab3 =  findViewById(R.id.fab3);
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab1 = findViewById(R.id.fab1);
+        fab_gallery = findViewById(R.id.fab_gallery);
+        fab_pdf = findViewById(R.id.fab_pdf);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isFABOpen){
+                if (!isFABOpen) {
                     showFABMenu();
-                }else{
+                } else {
                     closeFABMenu();
                 }
             }
         });
 
+        fab_gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checker = "image";
 
+                //send to phone gallery
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent.createChooser(intent, "Select Image"), 438);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            }
+        });
+
+        fab_pdf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checker = "pdf";
+
+                //send to file manager.
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("application/*");
+                startActivityForResult(intent.createChooser(intent, "Select PDF file"), 438);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            }
+        });
+
+
+        //setting user toolbar seen.
         displayLastSeen();
     }
 
-    private void showFABMenu(){
-        isFABOpen=true;
+    private void showFABMenu() {
+        isFABOpen = true;
         fab1.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
-        fab2.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
-        fab3.animate().translationY(-getResources().getDimension(R.dimen.standard_155));
+        fab_gallery.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
+        fab_pdf.animate().translationY(-getResources().getDimension(R.dimen.standard_155));
     }
 
-    private void closeFABMenu(){
-        isFABOpen=false;
+    private void closeFABMenu() {
+        isFABOpen = false;
         fab1.animate().translationY(0);
-        fab2.animate().translationY(0);
-        fab3.animate().translationY(0);
+        fab_gallery.animate().translationY(0);
+        fab_pdf.animate().translationY(0);
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("hi", "onActivityResult: "+"hi");
+        Log.d("hi", "onActivityResult: " + "hi");
 
-        if(requestCode == 438 && resultCode == RESULT_OK && data != null && data.getData() != null){
-            Log.d("forimage", "onActivityResult: "+"forimage");
-            loadingBar .setTitle("Sending File");
+        if (requestCode == 438 && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Log.d("forimage", "onActivityResult: " + "forimage");
+            loadingBar.setTitle("Sending File");
             loadingBar.setMessage("Please wait, for a while");
             loadingBar.setCanceledOnTouchOutside(false);
             loadingBar.show();
 
             fileUri = data.getData();
 
-            if(!checker.equals("image")){
+            if (!checker.equals("image")) {
                 //document
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                         .child("Document Files");
@@ -318,7 +342,7 @@ public class ChatActivity extends AppCompatActivity {
                 uploadTask.continueWithTask(new Continuation() {
                     @Override
                     public Object then(@NonNull Task task) throws Exception {
-                        if(!task.isSuccessful()){
+                        if (!task.isSuccessful()) {
                             throw task.getException();
                         }
 
@@ -327,7 +351,7 @@ public class ChatActivity extends AppCompatActivity {
                 }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                     @Override
                     public void onComplete(@NonNull Task<Uri> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             Uri downloadUri = task.getResult();
 
                             my_Url = downloadUri.toString();
@@ -375,8 +399,8 @@ public class ChatActivity extends AppCompatActivity {
                 });
 
 
-            }else if(checker.equals("image")){
-                Log.d("inimage", "onActivityResult: "+ "inimage");
+            } else if (checker.equals("image")) {
+                Log.d("inimage", "onActivityResult: " + "inimage");
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                         .child("Image Files");
 
@@ -394,7 +418,7 @@ public class ChatActivity extends AppCompatActivity {
                 uploadTask.continueWithTask(new Continuation() {
                     @Override
                     public Object then(@NonNull Task task) throws Exception {
-                        if(!task.isSuccessful()){
+                        if (!task.isSuccessful()) {
                             throw task.getException();
                         }
 
@@ -403,7 +427,7 @@ public class ChatActivity extends AppCompatActivity {
                 }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                     @Override
                     public void onComplete(@NonNull Task<Uri> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             Uri downloadUri = task.getResult();
 
                             my_Url = downloadUri.toString();
@@ -442,7 +466,7 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 });
 
-            }else{
+            } else {
                 Toast.makeText(this, "Nothing selected", Toast.LENGTH_SHORT).show();
                 loadingBar.dismiss();
 
@@ -459,7 +483,7 @@ public class ChatActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("state", "updateUserStatus: " );
+                        Log.d("state", "updateUserStatus: ");
 
                     }
 
