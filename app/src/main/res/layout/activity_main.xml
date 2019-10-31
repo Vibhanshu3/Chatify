@@ -58,20 +58,20 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
         android:background="@drawable/gradient_shape">
+
+        <ImageView
+            android:id="@+id/main_activity_add_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_circle_outline" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/navigation_rec_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </androidx.recyclerview.widget.RecyclerView>
-
-        <include
-            android:id="@+id/create_group_navigation_btn"
-            layout="@layout/custom_navigation_layout">
-        </include>
-
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>
