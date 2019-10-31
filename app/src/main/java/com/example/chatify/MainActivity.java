@@ -63,6 +63,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.zip.Inflater;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static java.security.AccessController.getContext;
@@ -99,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ButterKnife.bind(this);
+
         mtoolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mtoolbar);
         getSupportActionBar().setTitle("Chatify");
@@ -114,19 +119,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
         });
         navRexView = findViewById(R.id.navigation_rec_view);
-
-        View view;
-        LayoutInflater inflater = (LayoutInflater)getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = inflater.inflate(R.layout.custom_navigation_layout, null);
-        groupAddImage = view.findViewById(R.id.group_image);
-        groupAddImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("groupimage", "onClick: " + "group");
-                requestNewGroup();
-
-            }
-        });
 
         navRexView = findViewById(R.id.navigation_rec_view);
         groupList = new ArrayList<>();
@@ -462,6 +454,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         return true;
     }
 
+    @OnClick(R.id.main_activity_add_group)
+    public void addGroup() {
+        requestNewGroup();
+    }
 }
 
 
