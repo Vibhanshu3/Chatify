@@ -8,23 +8,19 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.chatify.Adapters.StoryAdapter;
-import com.example.chatify.Data.AllUsers;
-import com.example.chatify.Data.Group;
+import com.example.chatify.adapters.StoryAdapter;
+import com.example.chatify.model.User;
 import com.example.chatify.Data.Story;
 import com.example.chatify.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -115,16 +111,16 @@ public class ContactsFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        FirebaseRecyclerOptions<AllUsers> options = new FirebaseRecyclerOptions
-                .Builder<AllUsers>()
-                .setQuery(contactsReference.child(currUserID), AllUsers.class)
+        FirebaseRecyclerOptions<User> options = new FirebaseRecyclerOptions
+                .Builder<User>()
+                .setQuery(contactsReference.child(currUserID), User.class)
                 .build();
 
 
-        FirebaseRecyclerAdapter<AllUsers, AllUserViewHolder> adapter
-                = new FirebaseRecyclerAdapter<AllUsers, AllUserViewHolder>(options) {
+        FirebaseRecyclerAdapter<User, AllUserViewHolder> adapter
+                = new FirebaseRecyclerAdapter<User, AllUserViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull final AllUserViewHolder allUserViewHolder, int i, @NonNull AllUsers allUsers) {
+            protected void onBindViewHolder(@NonNull final AllUserViewHolder allUserViewHolder, int i, @NonNull User allUsers) {
                 String userIDs = getRef(i).getKey();
 
                     userReference.child(userIDs).addValueEventListener(new ValueEventListener() {

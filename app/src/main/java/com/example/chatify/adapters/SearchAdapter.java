@@ -1,4 +1,4 @@
-package com.example.chatify.Adapters;
+package com.example.chatify.adapters;
 
 import android.content.Context;
 import android.util.Log;

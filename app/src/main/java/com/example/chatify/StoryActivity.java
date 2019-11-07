@@ -4,24 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.chatify.Data.AllUsers;
+import com.example.chatify.model.User;
 import com.example.chatify.Data.Story;
-import com.example.chatify.Data.Views;
-import com.firebase.ui.auth.data.model.User;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -264,7 +257,7 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                AllUsers user = dataSnapshot.getValue(AllUsers.class);
+                User user = dataSnapshot.getValue(User.class);
                 Picasso.get().load(user.getUser_Image()).into(story_photo);
                 story_username.setText(user.getUser_Name());
             }

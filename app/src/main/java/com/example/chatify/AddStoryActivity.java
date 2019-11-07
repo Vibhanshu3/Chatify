@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
+import com.example.chatify.activity.MainActivity;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;

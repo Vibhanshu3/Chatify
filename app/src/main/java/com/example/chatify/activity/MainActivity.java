@@ -1,50 +1,46 @@
-package com.example.chatify;
+package com.example.chatify.activity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
-import android.content.DialogInterface;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.chatify.Adapters.NavigationAdapter;
-import com.example.chatify.Adapters.SearchAdapter;
-import com.example.chatify.Adapters.StoryAdapter;
-import com.example.chatify.Adapters.TabsAccessorAdapter;
-import com.example.chatify.Data.AllUsers;
-import com.example.chatify.Data.Group;
-import com.example.chatify.Fragments.ChatsFragment;
+import com.example.chatify.adapters.ContactAdapter;
+import com.example.chatify.adapters.GroupsAdapter;
+import com.example.chatify.adapters.SearchAdapter;
+import com.example.chatify.adapters.TabsAccessorAdapter;
+import com.example.chatify.AllUserActivity;
+import com.example.chatify.AppUtils.AppUtils;
+import com.example.chatify.model.Contact;
 import com.example.chatify.Login.LoginActivity;
+import com.example.chatify.R;
+import com.example.chatify.SettingActivity2;
+import com.example.chatify.model.Group;
+import com.example.chatify.model.GroupMember;
+import com.example.chatify.model.User;
+import com.example.chatify.presenter.MainActivityPresenter;
+import com.example.chatify.view.MainActivityView;
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -52,25 +48,39 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.zip.Inflater;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 
-import static java.security.AccessController.getContext;
+import static com.example.chatify.AppUtils.AppConst.DB_CONTACTS_KEY;
+import static com.example.chatify.AppUtils.AppConst.DB_GROUPS_ROLE_ADMIN;
+import static com.example.chatify.AppUtils.AppConst.DB_GROUPS_ROLE_MEMBER;
+import static com.example.chatify.AppUtils.AppConst.DB_USERS_GROUPS;
+import static com.example.chatify.AppUtils.AppConst.DB_USERS_KEY;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, View.OnClickListener, MainActivityView, ContactAdapter.ClickListener, GroupsAdapter.ClickListener {
+    @BindView(R.id.main_activity_navigation_groups)
+    RecyclerView groupsRecyclerView;
+
+    private List<GroupMember> groupContacts;
+
+    private EditText dialogGroupName;
+    private Dialog dialog;
+
+    private FirebaseUser user;
+    private DatabaseReference databaseReference;
+
+    private MainActivityPresenter presenter;
+    private User userDetails;
 
     private Toolbar mtoolbar;
     private ViewPager myViewPager;
@@ -80,15 +90,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     //navigation drawer.
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
-    private RecyclerView navRexView;
-    private CircleImageView groupAddImage;
-    private NavigationAdapter navigationAdapter;
-    private List<Group> groupList;
 
     FirebaseAuth mauth;
-    private DatabaseReference databaseReference;
     String currentUser;
-    FirebaseUser user;
     int flag = 0;
 
     List<String> list;
@@ -118,17 +122,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 drawerToggle.syncState();
             }
         });
-        navRexView = findViewById(R.id.navigation_rec_view);
-
-        navRexView = findViewById(R.id.navigation_rec_view);
-        groupList = new ArrayList<>();
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        navRexView.setLayoutManager(linearLayoutManager);
-        navigationAdapter = new NavigationAdapter(groupList);
-        navRexView.setAdapter(navigationAdapter);
-        navRexView.setHasFixedSize(true);
-
-
 
 
         if(tag == 0) {
@@ -161,18 +154,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             databaseReference.child("Contacts").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Log.e("Count " ,""+dataSnapshot.getChildrenCount());
                     for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                          String contactID = postSnapshot.getRef().getKey();
-                        Log.d("getData", "onDataChange: "+ postSnapshot.getRef());
 
                         databaseReference.child("User").child(contactID).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 String username = dataSnapshot.child("User_Name").getValue().toString();
-                                Log.d("username", "onDataChange:  " + username);
                                 list.add(username);
-                                Log.d("list", "onDataChange:  " + list);
 
                             }
 
@@ -192,12 +181,21 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             });
 
         }
-
-        Log.d("listuser", "onCreate: " + list);
-
-
+        init();
     }
 
+    private void init() {
+        presenter = new MainActivityPresenter(this);
+
+        GroupsAdapter groupsAdapter = new GroupsAdapter(new FirebaseRecyclerOptions
+                .Builder<String>()
+                .setQuery(databaseReference.child(DB_USERS_KEY).child(user.getUid()).child(DB_USERS_GROUPS), String.class)
+                .build(), this);
+
+        groupsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        groupsRecyclerView.setAdapter(groupsAdapter);
+        groupsAdapter.startListening();
+    }
 
     @Override
     public void onStart() {
@@ -213,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             updateUserStatus("Online");
 
             Log.d("main", "onStart: " + "in main");
-            verifyUserExistance();
+            verifyUserExistence();
         }
         //   Log.d("main", "onStart: " + currentUser);
     }
@@ -243,7 +241,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -253,15 +250,16 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 
-    private void verifyUserExistance() {
+    private void verifyUserExistence() {
         currentUser = mauth.getCurrentUser().getUid();
 
-        databaseReference.child("User").child(currentUser).addValueEventListener(new ValueEventListener() {
+        databaseReference.child(DB_USERS_KEY).child(currentUser).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //FixME: what this code is doing?
                 if (dataSnapshot.child("User_Name").exists()) {
                     Log.d("check", "onDataChange: " + "check");
-                    Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(MainActivity.this, "Go to settings", Toast.LENGTH_SHORT).show();
                     sendUserToSettingActivity();
@@ -314,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 return true;
 
             case R.id.main_menu_Group:
-                requestNewGroup();
+                addGroup();
                 flag = 1;
                 return true;
 
@@ -322,54 +320,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 return false;
         }
     }
-
-    private void requestNewGroup() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
-        builder.setTitle("Enter Group Name");
-
-        final EditText groupNameField = new EditText(this);
-        groupNameField.setHint("Your Group Name");
-
-        builder.setView(groupNameField);
-        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String groupName = groupNameField.getText().toString();
-                if (TextUtils.isEmpty(groupName)) {
-                    Toast.makeText(MainActivity.this, "Group name is blank", Toast.LENGTH_SHORT).show();
-                } else {
-                    Group group = new Group();
-                    group.setGroup_Name(groupName);
-                    groupList.add(group);
-
-                    createNewGroup(groupName);
-                }
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-
-            }
-        });
-
-        builder.show();
-    }
-
-    private void createNewGroup(String groupName) {
-        databaseReference.child("Groups").child(groupName).child("Group_Name").setValue(groupName)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "Group successfully created", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
 
     private void sendUserToLoginActivity() {
         Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -384,16 +334,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     private void logout() {
-
         AuthUI.getInstance()
                 .signOut(this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(MainActivity.this, "Sign Out", Toast.LENGTH_SHORT).show();
-                        Log.d("us", "onComplete: " + "logout");
-                        sendUserToLoginActivity();
-                    }
+                .addOnCompleteListener(task -> {
+                    Toast.makeText(MainActivity.this, "Sign Out", Toast.LENGTH_SHORT).show();
+                    Log.d("us", "onComplete: " + "logout");
+                    sendUserToLoginActivity();
                 });
     }
 
@@ -422,13 +368,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     }
 
-//    public void updateList(List<String> newList){
-//        name = new ArrayList<>();
-//        names.addAll(newList);
-//        notifyDataSetChanged();
-//    }
-
-
     @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
@@ -454,9 +393,79 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         return true;
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.dialog_group_cancel:
+                dialog.dismiss();
+                break;
+            case R.id.dialog_group_create:
+                presenter.createGroup(user.getUid(), dialogGroupName.getText().toString(), "", groupContacts);
+                break;
+        }
+    }
+
+    @Override
+    public void onContactSelected(String id, View view) {
+        GroupMember member = AppUtils.checkGroupMemberExist(id, groupContacts);
+
+        if (member == null) {
+            groupContacts.add(new GroupMember(id, DB_GROUPS_ROLE_MEMBER));
+            view.setBackgroundColor(Color.GREEN);
+        } else {
+            groupContacts.remove(member);
+            view.setBackgroundColor(Color.WHITE);
+        }
+    }
+
+    @Override
+    public void error(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void groupAdded() {
+        dialog.dismiss();
+        Toast.makeText(this, "goto chat screen", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onGroupSelected(Group group) {
+        Toast.makeText(this, "goto chat screen", Toast.LENGTH_SHORT).show();
+    }
+
     @OnClick(R.id.main_activity_add_group)
     public void addGroup() {
-        requestNewGroup();
+        groupContacts = new ArrayList<>();
+        groupContacts.add(new GroupMember(user.getUid(), DB_GROUPS_ROLE_ADMIN));
+
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_add_group);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Window window = dialog.getWindow();
+
+        Objects.requireNonNull(window).setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawableResource(android.R.color.transparent);
+
+        dialog.findViewById(R.id.dialog_group_cancel).setOnClickListener(this);
+        dialog.findViewById(R.id.dialog_group_create).setOnClickListener(this);
+
+        dialogGroupName = dialog.findViewById(R.id.dialog_add_group_name);
+
+        ContactAdapter adapter = new ContactAdapter(new FirebaseRecyclerOptions
+                .Builder<Contact>()
+                .setQuery(databaseReference.child(DB_CONTACTS_KEY).child(user.getUid()), Contact.class)
+                .build(), this);
+
+        RecyclerView dialogContactsList = dialog.findViewById(R.id.dialog_group_contacts_list);
+        dialogContactsList.setLayoutManager(new LinearLayoutManager(this));
+        dialogContactsList.setAdapter(adapter);
+
+        adapter.startListening();
+
+        dialog.show();
     }
 }
 

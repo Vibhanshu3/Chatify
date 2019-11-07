@@ -1,4 +1,4 @@
-package com.example.chatify.Adapters;
+package com.example.chatify.adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatify.AddStoryActivity;
-import com.example.chatify.Data.AllUsers;
+import com.example.chatify.model.User;
 import com.example.chatify.Data.Story;
 import com.example.chatify.R;
 import com.example.chatify.StoryActivity;
@@ -119,7 +119,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                AllUsers user = dataSnapshot.getValue(AllUsers.class);
+                User user = dataSnapshot.getValue(User.class);
                 Picasso.get().load(user.getUser_Image()).placeholder(R.drawable.profile_image).into(viewHolder.storyPhoto);
                 if(pos != 0){
                     Picasso.get().load(user.getUser_Image()).placeholder(R.drawable.profile_image).into(viewHolder.storyPhotoSeen);
