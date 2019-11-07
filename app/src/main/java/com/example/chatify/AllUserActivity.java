@@ -3,8 +3,6 @@ package com.example.chatify;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
@@ -16,13 +14,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chatify.Data.AllUsers;
+import com.example.chatify.model.User;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -58,15 +54,15 @@ private DatabaseReference userReference;
     protected void onStart() {
         super.onStart();
 
-        FirebaseRecyclerOptions<AllUsers> options = new FirebaseRecyclerOptions.Builder<AllUsers>()
-                .setQuery(userReference, AllUsers.class)
+        FirebaseRecyclerOptions<User> options = new FirebaseRecyclerOptions.Builder<User>()
+                .setQuery(userReference, User.class)
                 .build();
 
-        FirebaseRecyclerAdapter<AllUsers,AllUserViewHolder> firebaseRecyclerAdapter =
-           new FirebaseRecyclerAdapter<AllUsers, AllUserViewHolder>(options) {
+        FirebaseRecyclerAdapter<User,AllUserViewHolder> firebaseRecyclerAdapter =
+           new FirebaseRecyclerAdapter<User, AllUserViewHolder>(options) {
 
                @Override
-               protected void onBindViewHolder(@NonNull final AllUserViewHolder allUserViewHolder, final int i, @NonNull final AllUsers allUsers) {
+               protected void onBindViewHolder(@NonNull final AllUserViewHolder allUserViewHolder, final int i, @NonNull final User allUsers) {
                    allUserViewHolder.userName.setText(allUsers.getUser_Name());
                    allUserViewHolder.userstatus.setText(allUsers.getUser_Status());
 

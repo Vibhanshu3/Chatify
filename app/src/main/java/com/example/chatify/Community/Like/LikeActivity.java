@@ -7,7 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.chatify.R;
-import com.example.chatify.Utils.BottomNavigationHelper;
+import com.example.chatify.AppUtils.BottomNavigationHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 public class LikeActivity extends AppCompatActivity {

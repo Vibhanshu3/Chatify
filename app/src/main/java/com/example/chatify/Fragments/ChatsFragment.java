@@ -10,20 +10,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.chatify.ChatActivity;
-import com.example.chatify.Data.AllUsers;
+import com.example.chatify.model.User;
 import com.example.chatify.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -32,7 +26,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -53,7 +46,7 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
     private FirebaseAuth mAuth;
     private String curruserID;
 
-    private List<AllUsers> list;
+    private List<User> list;
 
     public ChatsFragment(){
 
@@ -84,13 +77,13 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
     public void onStart() {
         super.onStart();
 
-        FirebaseRecyclerOptions<AllUsers> options = new FirebaseRecyclerOptions
-                .Builder<AllUsers>()
-                .setQuery(chatsReference, AllUsers.class)
+        FirebaseRecyclerOptions<User> options = new FirebaseRecyclerOptions
+                .Builder<User>()
+                .setQuery(chatsReference, User.class)
                 .build();
 
-        FirebaseRecyclerAdapter<AllUsers, ChatsFragment.AllUserViewHolder> adapter
-                = new FirebaseRecyclerAdapter<AllUsers, AllUserViewHolder>(options) {
+        FirebaseRecyclerAdapter<User, ChatsFragment.AllUserViewHolder> adapter
+                = new FirebaseRecyclerAdapter<User, AllUserViewHolder>(options) {
             @NonNull
             @Override
             public AllUserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -100,7 +93,7 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
             }
 
             @Override
-            protected void onBindViewHolder(@NonNull final AllUserViewHolder allUserViewHolder, int i, @NonNull AllUsers allUsers) {
+            protected void onBindViewHolder(@NonNull final AllUserViewHolder allUserViewHolder, int i, @NonNull User allUsers) {
                 final String userIDs = getRef(i).getKey();
                 final String[] image = {"defafult_image"};
 
@@ -110,7 +103,7 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
 
 //                      Toast.makeText(getContext(), "hi", Toast.LENGTH_SHORT).show();
 
-                        AllUsers user = new AllUsers();
+                        User user = new User();
 
                         if(dataSnapshot.exists()){
                             if(dataSnapshot.hasChild("User_Image")){

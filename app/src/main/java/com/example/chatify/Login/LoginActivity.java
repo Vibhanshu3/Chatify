@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.chatify.MainActivity;
+import com.example.chatify.activity.MainActivity;
 import com.example.chatify.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -17,7 +17,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 

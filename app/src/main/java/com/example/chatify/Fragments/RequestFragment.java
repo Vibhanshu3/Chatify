@@ -1,8 +1,6 @@
 package com.example.chatify.Fragments;
 
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,11 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.chatify.Data.AllUsers;
+import com.example.chatify.model.User;
 import com.example.chatify.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -31,9 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -75,17 +69,17 @@ public class RequestFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        FirebaseRecyclerOptions<AllUsers> options = new FirebaseRecyclerOptions
-                .Builder<AllUsers>()
-                .setQuery(chatRequestReference.child(currUserID), AllUsers.class)
+        FirebaseRecyclerOptions<User> options = new FirebaseRecyclerOptions
+                .Builder<User>()
+                .setQuery(chatRequestReference.child(currUserID), User.class)
                 .build();
 
-        FirebaseRecyclerAdapter<AllUsers, RequestViewHolder> adapter =
-                new FirebaseRecyclerAdapter<AllUsers, RequestViewHolder>(options) {
+        FirebaseRecyclerAdapter<User, RequestViewHolder> adapter =
+                new FirebaseRecyclerAdapter<User, RequestViewHolder>(options) {
 
 
                     @Override
-                    protected void onBindViewHolder(@NonNull final RequestViewHolder requestViewHolder, int i, @NonNull AllUsers allUsers) {
+                    protected void onBindViewHolder(@NonNull final RequestViewHolder requestViewHolder, int i, @NonNull User allUsers) {
                         requestViewHolder.accept.setVisibility(View.VISIBLE);
                         requestViewHolder.cancel.setVisibility(View.VISIBLE);
 

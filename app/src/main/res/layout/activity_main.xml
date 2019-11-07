@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_shape"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -53,25 +53,27 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!--for navigation-->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="120dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:orientation="vertical"
+        android:background="@drawable/gradient_shape"
         android:clickable="true"
         android:focusable="true"
-        android:background="@drawable/gradient_shape">
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/main_activity_add_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_centerHorizontal="true"
             android:src="@drawable/ic_add_circle_outline" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/navigation_rec_view"
+            android:id="@+id/main_activity_navigation_groups"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_below="@id/main_activity_add_group" />
+    </RelativeLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>
