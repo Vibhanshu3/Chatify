@@ -27,9 +27,9 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.example.chatify.AppUtils.AppConst.DB_USERS_KEY;
-import static com.example.chatify.AppUtils.AppConst.DB_USERS_STATE_ONLINE;
-import static com.example.chatify.AppUtils.AppConst.LOG_MAIN_ACTIVITY;
+import static com.example.chatify.utils.AppConst.DB_USERS_KEY;
+import static com.example.chatify.utils.AppConst.DB_USERS_STATE_ONLINE;
+import static com.example.chatify.utils.AppConst.LOG_MAIN;
 
 public class ContactAdapter extends FirebaseRecyclerAdapter<Contact, ContactAdapter.ContactViewHolder> {
     private DatabaseReference userReference;
@@ -71,7 +71,7 @@ public class ContactAdapter extends FirebaseRecyclerAdapter<Contact, ContactAdap
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(LOG_MAIN_ACTIVITY, databaseError.getDetails());
+                Log.e(LOG_MAIN, databaseError.getDetails());
             }
         });
     }

@@ -5,9 +5,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.example.chatify.Fragments.ChatsFragment;
-import com.example.chatify.Fragments.ContactsFragment;
-import com.example.chatify.Fragments.RequestFragment;
+import com.example.chatify.fragments.ChatsFragment;
+import com.example.chatify.fragments.CommunityFragment;
+import com.example.chatify.fragments.ContactsFragment;
+import com.example.chatify.fragments.RequestFragment;
 
 public class TabsAccessorAdapter extends FragmentStatePagerAdapter {
     public TabsAccessorAdapter(FragmentManager fm) {
@@ -17,7 +18,7 @@ public class TabsAccessorAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int i) {
 
-        switch (i){
+        switch (i) {
             case 0:
                 ChatsFragment chatsFragment = new ChatsFragment();
                 return chatsFragment;
@@ -31,11 +32,14 @@ public class TabsAccessorAdapter extends FragmentStatePagerAdapter {
                 return contactsFragment;
 
             case 2:
-                RequestFragment requestFragment = new RequestFragment();
-                return requestFragment;
+                return CommunityFragment.newInstance();
 
-             default:
-                 return null;
+//            case 2:
+//                RequestFragment requestFragment = new RequestFragment();
+//                return requestFragment;
+
+            default:
+                return null;
         }
 
     }
@@ -49,7 +53,7 @@ public class TabsAccessorAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
 
-        switch (position){
+        switch (position) {
             case 0:
                 return "Chats";
 
@@ -60,9 +64,10 @@ public class TabsAccessorAdapter extends FragmentStatePagerAdapter {
                 return "Contacts";
 
             case 2:
-                return "Request";
+                return "Community";
 
-
+//            case 2:
+//                return "Request";
 
             default:
                 return null;

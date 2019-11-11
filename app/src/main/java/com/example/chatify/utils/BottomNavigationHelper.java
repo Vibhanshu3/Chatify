@@ -1,4 +1,4 @@
-package com.example.chatify.AppUtils;
+package com.example.chatify.utils;
 
 import android.content.Context;
 import android.content.Intent;

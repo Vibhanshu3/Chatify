@@ -8,6 +8,8 @@
     android:background="@drawable/gradient_shape"
     tools:context=".activity.MainActivity">
 
+    <!-- FixMe: View pager bottom -->
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

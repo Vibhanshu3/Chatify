@@ -23,8 +23,8 @@ import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.example.chatify.AppUtils.AppConst.DB_GROUPS_KEY;
-import static com.example.chatify.AppUtils.AppConst.LOG_MAIN_ACTIVITY;
+import static com.example.chatify.utils.AppConst.DB_GROUPS_KEY;
+import static com.example.chatify.utils.AppConst.LOG_MAIN;
 
 public class GroupsAdapter extends FirebaseRecyclerAdapter<String, GroupsAdapter.GroupViewHolder> {
     private ClickListener clickListener;
@@ -61,7 +61,7 @@ public class GroupsAdapter extends FirebaseRecyclerAdapter<String, GroupsAdapter
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(LOG_MAIN_ACTIVITY, databaseError.getDetails());
+                Log.e(LOG_MAIN, databaseError.getDetails());
             }
         });
     }

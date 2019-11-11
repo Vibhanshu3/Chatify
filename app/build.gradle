@@ -68,5 +68,8 @@ dependencies {
     //butterknife
     implementation 'com.jakewharton:butterknife:10.2.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
+
+    //Json for shared Preference
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
 apply plugin: 'com.google.gms.google-services'
