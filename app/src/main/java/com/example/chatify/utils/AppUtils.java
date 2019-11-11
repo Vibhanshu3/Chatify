@@ -1,4 +1,4 @@
-package com.example.chatify.AppUtils;
+package com.example.chatify.utils;
 
 import com.example.chatify.model.GroupMember;
 

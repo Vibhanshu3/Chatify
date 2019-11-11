@@ -33,7 +33,7 @@
             android:id="@+id/dialog_group_contacts_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/dialog_add_group_bottom"
+            android:layout_above="@id/cancel_create_container"
             android:layout_below="@id/dialog_add_group_name"
             android:layout_marginTop="16dp" />
 
@@ -41,35 +41,14 @@
             android:id="@+id/dialog_group_no_contacts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/dialog_add_group_bottom"
+            android:layout_above="@id/cancel_create_container"
             android:layout_below="@id/dialog_add_group_name"
             android:layout_marginTop="16dp"
             android:gravity="center"
             android:visibility="gone"
             android:text="No Contacts to add" />
 
-        <LinearLayout
-            android:id="@+id/dialog_add_group_bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/dialog_group_cancel"
-                style="?android:attr/actionModeCloseButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@android:string/cancel" />
-
-            <Button
-                android:id="@+id/dialog_group_create"
-                style="?android:attr/actionButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/create" />
-        </LinearLayout>
+        <include
+            layout="@layout/layout_cancel_create" />
     </RelativeLayout>
 </LinearLayout>

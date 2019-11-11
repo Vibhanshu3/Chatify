@@ -1,22 +1,25 @@
-package com.example.chatify.Login;
+package com.example.chatify.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.chatify.activity.MainActivity;
 import com.example.chatify.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.chatify.model.User;
+import com.example.chatify.utils.AppSharedPreferences;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 
@@ -26,24 +29,26 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import java.util.List;
 
+import static com.example.chatify.utils.AppConst.DB_USERS_KEY;
+import static com.example.chatify.utils.AppConst.DB_USERS_TOKEN;
+import static com.example.chatify.utils.AppConst.LOG_LOGIN;
+
 
 public class LoginActivity extends AppCompatActivity {
 
     public static final int RC_SIGN_IN = 1;
 
     FirebaseAuth mauth;
-    private FirebaseUser currentUser;
     DatabaseReference userReference;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
         mauth = FirebaseAuth.getInstance();
       //  currentUser = mauth.getCurrentUser();
-        userReference = FirebaseDatabase.getInstance().getReference();
+        userReference = FirebaseDatabase.getInstance().getReference().child(DB_USERS_KEY);
 
 
     }
@@ -127,55 +132,44 @@ public class LoginActivity extends AppCompatActivity {
 
         AuthUI.getInstance()
                 .signOut(this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(LoginActivity.this, "Sign Out", Toast.LENGTH_SHORT).show();
-                        onStart();
-                    }
+                .addOnCompleteListener(task -> {
+                    Toast.makeText(LoginActivity.this, "Sign Out", Toast.LENGTH_SHORT).show();
+                    onStart();
                 });
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
-                // Successfully signed in
-                 currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                 userReference = FirebaseDatabase.getInstance().getReference();
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-             //    userReference.child("User").child(currentUser.getUid()).child("Online").setValue("true");
+                if (currentUser != null) {
+                    String deviceToken = FirebaseInstanceId.getInstance().getToken();
+                    userReference
+                            .child(currentUser.getUid())
+                            .child(DB_USERS_TOKEN)
+                            .setValue(deviceToken)
+                            .addOnSuccessListener(aVoid -> userReference.child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    AppSharedPreferences.setUser(getApplicationContext(), dataSnapshot.getValue(User.class));
+                                }
 
-                //  flag =1;
-                // online_user = user.getUid();
-
-                String deviceToken = FirebaseInstanceId.getInstance().getToken();
-                //String online_userO = mauth.getCurrentUser().getUid();
-
-                userReference.child("User").child(mauth.getCurrentUser().getUid()).child("Device_Token").setValue(deviceToken)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                //
-                            }
-                        });
-
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Log.e(LOG_LOGIN, databaseError.getDetails());
+                                }
+                            }));
+                }
                 Intent settingIntent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(settingIntent);
                 finish();
-
-                // ...
             } else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
-
                 String e = response.getError().toString();
                 Toast.makeText(this, "e" + e, Toast.LENGTH_SHORT).show();
             }

@@ -10,6 +10,7 @@ public class User {
     private String User_Thumb_Image;
     private UserState User_State;
     private List<String> groups;
+    private List<String> posts;
 
     public User() {
     }
@@ -78,6 +79,14 @@ public class User {
 
     public void setGroups(List<String> groups) {
         this.groups = groups;
+    }
+
+    public List<String> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<String> posts) {
+        this.posts = posts;
     }
 }
 

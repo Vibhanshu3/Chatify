@@ -29,9 +29,8 @@ import com.example.chatify.adapters.GroupsAdapter;
 import com.example.chatify.adapters.SearchAdapter;
 import com.example.chatify.adapters.TabsAccessorAdapter;
 import com.example.chatify.AllUserActivity;
-import com.example.chatify.AppUtils.AppUtils;
+import com.example.chatify.utils.AppUtils;
 import com.example.chatify.model.Contact;
-import com.example.chatify.Login.LoginActivity;
 import com.example.chatify.R;
 import com.example.chatify.SettingActivity2;
 import com.example.chatify.model.Group;
@@ -61,11 +60,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.example.chatify.AppUtils.AppConst.DB_CONTACTS_KEY;
-import static com.example.chatify.AppUtils.AppConst.DB_GROUPS_ROLE_ADMIN;
-import static com.example.chatify.AppUtils.AppConst.DB_GROUPS_ROLE_MEMBER;
-import static com.example.chatify.AppUtils.AppConst.DB_USERS_GROUPS;
-import static com.example.chatify.AppUtils.AppConst.DB_USERS_KEY;
+import static com.example.chatify.utils.AppConst.DB_CONTACTS_KEY;
+import static com.example.chatify.utils.AppConst.DB_GROUPS_ROLE_ADMIN;
+import static com.example.chatify.utils.AppConst.DB_GROUPS_ROLE_MEMBER;
+import static com.example.chatify.utils.AppConst.DB_USERS_GROUPS;
+import static com.example.chatify.utils.AppConst.DB_USERS_KEY;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, View.OnClickListener, MainActivityView, ContactAdapter.ClickListener, GroupsAdapter.ClickListener {
     @BindView(R.id.main_activity_navigation_groups)
@@ -396,10 +395,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.dialog_group_cancel:
+            case R.id.cancel:
                 dialog.dismiss();
                 break;
-            case R.id.dialog_group_create:
+            case R.id.create:
                 presenter.createGroup(user.getUid(), dialogGroupName.getText().toString(), "", groupContacts);
                 break;
         }
@@ -449,8 +448,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         Objects.requireNonNull(window).setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         window.setBackgroundDrawableResource(android.R.color.transparent);
 
-        dialog.findViewById(R.id.dialog_group_cancel).setOnClickListener(this);
-        dialog.findViewById(R.id.dialog_group_create).setOnClickListener(this);
+        dialog.findViewById(R.id.cancel).setOnClickListener(this);
+        dialog.findViewById(R.id.create).setOnClickListener(this);
 
         dialogGroupName = dialog.findViewById(R.id.dialog_add_group_name);
 

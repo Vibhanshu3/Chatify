@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.example.chatify.AppUtils.AppConst.DB_GROUPS_KEY;
-import static com.example.chatify.AppUtils.AppConst.DB_USERS_GROUPS;
-import static com.example.chatify.AppUtils.AppConst.DB_USERS_KEY;
-import static com.example.chatify.AppUtils.AppConst.LOG_MAIN_ACTIVITY;
+import static com.example.chatify.utils.AppConst.DB_GROUPS_KEY;
+import static com.example.chatify.utils.AppConst.DB_USERS_GROUPS;
+import static com.example.chatify.utils.AppConst.DB_USERS_KEY;
+import static com.example.chatify.utils.AppConst.LOG_MAIN;
 
 public class MainActivityPresenter {
     private MainActivityView view;
@@ -49,7 +49,7 @@ public class MainActivityPresenter {
         group
                 .setValue(new Group(createdBy, groupName, groupImage, members))
                 .addOnFailureListener(e -> {
-                    Log.e(LOG_MAIN_ACTIVITY, e.getMessage());
+                    Log.e(LOG_MAIN, e.getMessage());
                     view.error("Something went wrong");
                 })
                 .addOnSuccessListener(aVoid -> {
@@ -76,7 +76,7 @@ public class MainActivityPresenter {
                                     reference
                                             .setValue(groups)
                                             .addOnFailureListener(e -> {
-                                                Log.e(LOG_MAIN_ACTIVITY, e.getMessage());
+                                                Log.e(LOG_MAIN, e.getMessage());
                                                 view.error("Something went wrong");
                                             });
                                 }
@@ -84,7 +84,7 @@ public class MainActivityPresenter {
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
-                                Log.e(LOG_MAIN_ACTIVITY, databaseError.getMessage());
+                                Log.e(LOG_MAIN, databaseError.getMessage());
                                 view.error("Something went wrong");
                             }
                         });
