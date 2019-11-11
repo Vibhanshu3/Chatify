@@ -10,6 +10,9 @@ public class Post {
     private String userName;
     private String userImage;
 
+    public Post() {
+    }
+
     public Post(String title, String description, String date, String time, String image, String userId, String userName, String userImage) {
         this.title = title;
         this.description = description;

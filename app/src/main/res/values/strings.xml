@@ -12,5 +12,7 @@
     <string name="error_empty_title">Title can\'t be empty</string>
     <string name="error_empty_description">Description can\'t empty</string>
     <string name="error_something_wrong">Something went wrong</string>
-
+    <string name="description_post_image">Post Image</string>
+    <string name="description_comment_icon">Comment Icon</string>
+    <string name="description_like_icon">Like Icon</string>
 </resources>

@@ -13,17 +13,26 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatify.R;
+import com.example.chatify.adapters.PostAdapter;
+import com.example.chatify.model.Post;
 import com.example.chatify.model.User;
 import com.example.chatify.presenter.CommunityPresenter;
 import com.example.chatify.utils.AppSharedPreferences;
 import com.example.chatify.view.CommunityView;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Calendar;
 import java.util.Locale;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
@@ -31,12 +40,20 @@ import butterknife.Unbinder;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static android.widget.Toast.LENGTH_LONG;
+import static com.example.chatify.utils.AppConst.DB_POSTS_KEY;
 
 //TODO: add image
 //TODO: add groups or category
 //TODO: add tags
+//FixMe: floating action button location
 
 public class CommunityFragment extends Fragment implements CommunityView, View.OnClickListener {
+    @BindView(R.id.recycler_view)
+    RecyclerView postList;
+
+    @BindView(R.id.loader)
+    ProgressBar loader;
+
     private Context context;
     private Dialog dialog;
     private ProgressBar dialogLoader;
@@ -55,8 +72,8 @@ public class CommunityFragment extends Fragment implements CommunityView, View.O
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         init();
     }
@@ -68,6 +85,15 @@ public class CommunityFragment extends Fragment implements CommunityView, View.O
 
         presenter = new CommunityPresenter(this);
 
+        postList.setLayoutManager(new LinearLayoutManager(context));
+
+        PostAdapter adapter = new PostAdapter(new FirebaseRecyclerOptions
+                .Builder<Post>()
+                .setQuery(FirebaseDatabase.getInstance().getReference().child(DB_POSTS_KEY), Post.class)
+                .build());
+
+        postList.setAdapter(adapter);
+        adapter.startListening();
     }
 
     @Override

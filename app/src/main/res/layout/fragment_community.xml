@@ -5,6 +5,10 @@
     android:layout_height="match_parent"
     tools:context=".fragments.CommunityFragment">
 
+    <include layout="@layout/layout_recycler_view" />
+
+    <include layout="@layout/layout_loader" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/community_new_post"
         android:layout_width="wrap_content"
