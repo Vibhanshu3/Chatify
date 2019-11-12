@@ -66,6 +66,8 @@ import static com.example.chatify.utils.AppConst.DB_GROUPS_ROLE_MEMBER;
 import static com.example.chatify.utils.AppConst.DB_USERS_GROUPS;
 import static com.example.chatify.utils.AppConst.DB_USERS_KEY;
 
+//FixMe: check of user is null
+
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, View.OnClickListener, MainActivityView, ContactAdapter.ClickListener, GroupsAdapter.ClickListener {
     @BindView(R.id.main_activity_navigation_groups)
     RecyclerView groupsRecyclerView;
@@ -147,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         list = new ArrayList<>();
 
         if (user != null) {
+            init();
             updateUserStatus("Online");
 
             //for search.
@@ -180,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             });
 
         }
-        init();
     }
 
     private void init() {
