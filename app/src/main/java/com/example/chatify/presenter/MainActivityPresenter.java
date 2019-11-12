@@ -46,7 +46,7 @@ public class MainActivityPresenter {
 
         DatabaseReference group = databaseReference.child(DB_GROUPS_KEY).push();
 
-        Group g = new Group(createdBy, groupName, groupImage, members);
+        Group g = new Group(group.getKey(), createdBy, groupName, groupImage, members);
 
         group
                 .setValue(g)

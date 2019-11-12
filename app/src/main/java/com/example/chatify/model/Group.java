@@ -3,6 +3,7 @@ package com.example.chatify.model;
 import java.util.List;
 
 public class Group {
+    private String groupId;
     private String createdBy;
     private String groupName;
     private String groupImage;
@@ -11,7 +12,8 @@ public class Group {
     public Group() {
     }
 
-    public Group(String createdBy, String groupName, String groupImage, List<GroupMember> members) {
+    public Group(String groupId, String createdBy, String groupName, String groupImage, List<GroupMember> members) {
+        this.groupId = groupId;
         this.createdBy = createdBy;
         this.groupName = groupName;
         this.groupImage = groupImage;
@@ -48,5 +50,13 @@ public class Group {
 
     public void setMembers(List<GroupMember> members) {
         this.members = members;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }
