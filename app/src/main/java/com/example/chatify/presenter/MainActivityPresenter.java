@@ -46,8 +46,10 @@ public class MainActivityPresenter {
 
         DatabaseReference group = databaseReference.child(DB_GROUPS_KEY).push();
 
+        Group g = new Group(createdBy, groupName, groupImage, members);
+
         group
-                .setValue(new Group(createdBy, groupName, groupImage, members))
+                .setValue(g)
                 .addOnFailureListener(e -> {
                     Log.e(LOG_MAIN, e.getMessage());
                     view.error("Something went wrong");
@@ -89,7 +91,7 @@ public class MainActivityPresenter {
                             }
                         });
                     }
-                    view.groupAdded();
+                    view.groupAdded(g);
                 });
     }
 }

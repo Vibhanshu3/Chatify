@@ -423,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     @Override
-    public void groupAdded() {
+    public void groupAdded(Group group) {
         dialog.dismiss();
         Toast.makeText(this, "goto chat screen", Toast.LENGTH_SHORT).show();
     }
