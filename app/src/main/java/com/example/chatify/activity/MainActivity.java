@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.chatify.ChatActivity;
+import com.example.chatify.GroupActivity;
 import com.example.chatify.adapters.ContactAdapter;
 import com.example.chatify.adapters.GroupsAdapter;
 import com.example.chatify.adapters.SearchAdapter;
@@ -48,7 +51,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -431,6 +436,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public void onGroupSelected(Group group) {
         Toast.makeText(this, "goto chat screen", Toast.LENGTH_SHORT).show();
+        Intent groupIntent = new Intent(MainActivity.this, GroupActivity.class);
+        groupIntent.putExtra("group",new Gson().toJson(group));
+        startActivity(groupIntent);
     }
 
     @OnClick(R.id.main_activity_add_group)

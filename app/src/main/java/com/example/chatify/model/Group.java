@@ -1,8 +1,9 @@
 package com.example.chatify.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Group {
+public class Group  implements Serializable {
     private String groupId;
     private String createdBy;
     private String groupName;

@@ -23,6 +23,8 @@
         <activity android:name=".Community.Home.HomeActivity" />
         <activity android:name=".StoryActivity" />
         <activity android:name=".AddStoryActivity" />
+        <activity android:name=".GroupActivity"
+            android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".SettingActivity2"
             android:parentActivityName=".activity.MainActivity" />
