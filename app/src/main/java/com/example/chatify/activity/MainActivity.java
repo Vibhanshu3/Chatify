@@ -406,6 +406,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             case R.id.create:
                 presenter.createGroup(user.getUid(), dialogGroupName.getText().toString(), "", groupContacts);
                 break;
+            case R.id.dialog_add_group_icon:
+                //add image
+
+
         }
     }
 
@@ -458,6 +462,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         dialog.findViewById(R.id.cancel).setOnClickListener(this);
         dialog.findViewById(R.id.create).setOnClickListener(this);
+        dialog.findViewById(R.id.dialog_add_group_icon).setOnClickListener(this);
 
         dialogGroupName = dialog.findViewById(R.id.dialog_add_group_name);
 

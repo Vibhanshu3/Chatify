@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 //import com.example.chatify.Adapters.MessageAdapter;
 import com.example.chatify.Data.Messages;
+import com.example.chatify.activity.MainActivity;
 import com.example.chatify.adapters.MessageAdapter;
 import com.example.chatify.model.Group;
 import com.google.android.gms.tasks.Continuation;
@@ -60,7 +61,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class GroupActivity extends AppCompatActivity {
 
-    private String messageReceiverID, receivedGroupImage, messageSenderID, receivedGroupName;
+    private String messageReceiverID, receivedGroupImage, messageSenderID, receivedGroupName, currUserName;
     private TextView groupName;
     private CircleImageView groupImage;
     private Toolbar chatToolbar;
@@ -97,7 +98,6 @@ public class GroupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         //info of receiver.
-       // messageReceiverID = getIntent().getExtras().get("visited_User_id").toString();
         group = new Gson().fromJson(getIntent().getStringExtra("group"), Group.class);
         receivedGroupImage = group.getGroupImage();
         receivedGroupName = group.getGroupName();
@@ -109,6 +109,15 @@ public class GroupActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
+
+        chatToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent groupIntent = new Intent(GroupActivity.this, GroupProfileActivity.class);
+                groupIntent.putExtra("group",new Gson().toJson(group));
+                startActivity(groupIntent);
+            }
+        });
 
         //?custom bar layout info.
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -131,6 +140,17 @@ public class GroupActivity extends AppCompatActivity {
         groupReference = FirebaseDatabase.getInstance().getReference().child("Groups");
         mAuth = FirebaseAuth.getInstance();
         messageSenderID = mAuth.getCurrentUser().getUid();
+        databaseReference.child("User").child(messageSenderID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                currUserName = dataSnapshot.child("User_Name").getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         //date and time.
         Calendar calender = Calendar.getInstance();
@@ -334,6 +354,8 @@ public class GroupActivity extends AppCompatActivity {
                             messageTextBody.put("messageID", messagePushID);
                             messageTextBody.put("time", saveCurrTime);
                             messageTextBody.put("date", saveCurrDate);
+                            messageTextBody.put("fromName", currUserName);
+                            messageTextBody.put("messageType", "group");
 
                             Map messageBodyDetails = new HashMap();
                             messageBodyDetails.put("Groups" + "/" + group.getGroupId() + "/" + "messages" + "/" + messagePushID, messageTextBody);
@@ -403,6 +425,8 @@ public class GroupActivity extends AppCompatActivity {
                             messageTextBody.put("messageID", messagePushID);
                             messageTextBody.put("time", saveCurrTime);
                             messageTextBody.put("date", saveCurrDate);
+                            messageTextBody.put("fromName", currUserName);
+                            messageTextBody.put("messageType", "group");
 
                             Map messageBodyDetails = new HashMap();
                             messageBodyDetails.put("Groups" + "/" + group.getGroupId() + "/" + "messages" + "/" + messagePushID, messageTextBody);
@@ -501,6 +525,8 @@ public class GroupActivity extends AppCompatActivity {
             messageTextBody.put("messageID", messagePushID);
             messageTextBody.put("time", saveCurrTime);
             messageTextBody.put("date", saveCurrDate);
+            messageTextBody.put("fromName", currUserName);
+            messageTextBody.put("messageType", "group");
 
             Map messageBodyDetails = new HashMap();
             messageBodyDetails.put("Groups" + "/" + group.getGroupId() + "/" + "messages" + "/" + messagePushID, messageTextBody);

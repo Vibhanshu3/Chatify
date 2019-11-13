@@ -2,13 +2,14 @@ package com.example.chatify.Data;
 
 public class Messages {
 
-    String message, type, from, to, messageID, time, date, name;
+    String message, type, from, to, messageID, time, date, name, fromName, messageType;
 
 
     public Messages() {
     }
 
-    public Messages(String message, String type, String from, String to, String messageID, String time, String date, String name) {
+    public Messages(String message, String type, String from, String to, String messageID, String time, String date, String name
+    , String fromName, String messageType) {
         this.message = message;
         this.type = type;
         this.from = from;
@@ -17,6 +18,24 @@ public class Messages {
         this.time = time;
         this.date = date;
         this.name = name;
+        this.fromName = fromName;
+        this.messageType = messageType;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
+    }
+
+    public String getFromName() {
+        return fromName;
+    }
+
+    public void setFromName(String fromName) {
+        this.fromName = fromName;
     }
 
     public String getMessage() {
