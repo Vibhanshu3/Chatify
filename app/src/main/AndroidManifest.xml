@@ -16,6 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".GroupProfileActivity"></activity>
         <activity android:name=".Community.Prof.ProfActivity" />
         <activity android:name=".Community.Share.ShareActivity" />
         <activity android:name=".Community.Like.LikeActivity" />
@@ -23,6 +24,9 @@
         <activity android:name=".Community.Home.HomeActivity" />
         <activity android:name=".StoryActivity" />
         <activity android:name=".AddStoryActivity" />
+        <activity
+            android:name=".GroupActivity"
+            android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".SettingActivity2"
             android:parentActivityName=".activity.MainActivity" />
@@ -33,7 +37,6 @@
         <activity
             android:name=".AllUserActivity"
             android:parentActivityName=".activity.MainActivity" />
-
         <activity
             android:name=".SettingActivity"
             android:parentActivityName=".activity.MainActivity" />
@@ -50,4 +53,5 @@
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
     </application>
+
 </manifest>

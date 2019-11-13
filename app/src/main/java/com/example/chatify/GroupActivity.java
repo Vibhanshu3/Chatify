@@ -1,5 +1,14 @@
 package com.example.chatify;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,17 +24,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.chatify.adapters.MessageAdapter;
+//import com.example.chatify.Adapters.MessageAdapter;
 import com.example.chatify.Data.Messages;
+import com.example.chatify.activity.MainActivity;
+import com.example.chatify.adapters.MessageAdapter;
+import com.example.chatify.model.Group;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,6 +45,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -51,21 +55,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatActivity extends AppCompatActivity {
+public class GroupActivity extends AppCompatActivity {
 
-    private String messageReceiverID, messageReceiverName, messageReceiverImage, messageSenderID;
-    private TextView username, userLastSeen;
-    private CircleImageView userimage;
+    private String messageReceiverID, receivedGroupImage, messageSenderID, receivedGroupName, currUserName;
+    private TextView groupName;
+    private CircleImageView groupImage;
     private Toolbar chatToolbar;
+    private Group group;
 
     private ImageButton sendMessageBtn, sendFilesBtn;
     private EditText messageInputText;
 
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
-
+    private DatabaseReference groupReference;
 
     private List<Messages> messageList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
@@ -84,16 +91,16 @@ public class ChatActivity extends AppCompatActivity {
     private FloatingActionButton fab_pdf;
     private Boolean isFABOpen;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        ButterKnife.bind(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
         //info of receiver.
-        messageReceiverID = getIntent().getExtras().get("visited_User_id").toString();
-        messageReceiverName = getIntent().getExtras().get("visited_User_name").toString();
-        messageReceiverImage = getIntent().getExtras().get("visited_User_image").toString();
+        group = new Gson().fromJson(getIntent().getStringExtra("group"), Group.class);
+        receivedGroupImage = group.getGroupImage();
+        receivedGroupName = group.getGroupName();
 
         //toolbar.
         chatToolbar = findViewById(R.id.chat_toolbar);
@@ -103,30 +110,50 @@ public class ChatActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 
+        chatToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent groupIntent = new Intent(GroupActivity.this, GroupProfileActivity.class);
+                groupIntent.putExtra("group",new Gson().toJson(group));
+                startActivity(groupIntent);
+            }
+        });
+
         //?custom bar layout info.
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View actionBarView = layoutInflater.inflate(R.layout.custom_chat_bar, null);
         actionBar.setCustomView(actionBarView);
 
-        username = findViewById(R.id.custom_profile_name);
-        userimage = findViewById(R.id.custom_profile_image);
-        userLastSeen = findViewById(R.id.custom_last_seen);
+        groupName = findViewById(R.id.custom_profile_name);
+        groupImage = findViewById(R.id.custom_profile_image);
 
         //chat input functions
         sendMessageBtn = findViewById(R.id.send_msg_btn);
         sendFilesBtn = findViewById(R.id.send_files_btn);
         messageInputText = findViewById(R.id.input_msg);
 
-        username.setText(messageReceiverName);
-        Picasso.get().load(messageReceiverImage).placeholder(R.drawable.default_image).into(userimage);
+        groupName.setText(receivedGroupName);
+      //  Picasso.get().load(receivedGroupImage).placeholder(R.drawable.default_image).into(groupImage);
 
         //firebase database.
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        groupReference = FirebaseDatabase.getInstance().getReference().child("Groups");
         mAuth = FirebaseAuth.getInstance();
         messageSenderID = mAuth.getCurrentUser().getUid();
+        databaseReference.child("User").child(messageSenderID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                currUserName = dataSnapshot.child("User_Name").getValue().toString();
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //date and time.
         Calendar calender = Calendar.getInstance();
-
         SimpleDateFormat currDate = new SimpleDateFormat("MM dd, yyyy");
         saveCurrDate = currDate.format(calender.getTime());
 
@@ -144,7 +171,7 @@ public class ChatActivity extends AppCompatActivity {
                                 "PDF Files",
                                 "Ms word Files"
                         };
-                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(GroupActivity.this);
                 builder.setTitle("Select the files");
 
                 builder.setItems(options, new DialogInterface.OnClickListener() {
@@ -251,10 +278,6 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-
-
-        //setting user toolbar seen.
-        displayLastSeen();
     }
 
     private void showFABMenu() {
@@ -269,6 +292,12 @@ public class ChatActivity extends AppCompatActivity {
         fab1.animate().translationY(0);
         fab_gallery.animate().translationY(0);
         fab_pdf.animate().translationY(0);
+    }
+
+    @OnClick(R.id.send_msg_btn)
+    void abc() {
+        sendMessage();
+
     }
 
 
@@ -291,52 +320,11 @@ public class ChatActivity extends AppCompatActivity {
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                         .child("Document Files");
 
-                final String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
-                final String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
-
-                DatabaseReference userMessageKeyRef = databaseReference.child("Messages")
-                        .child(messageSenderID).child(messageReceiverID).push();
-
-                final String messagePushID = userMessageKeyRef.getKey();
+                DatabaseReference groupReference = databaseReference.child("Groups").child(group.getGroupId())
+                        .child("messages").push();
+                String messagePushID = groupReference.getKey();
 
                 final StorageReference filePath = storageReference.child(messagePushID + "." + checker);
-
-//                filePath.putFile(fileUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-//                        if(task.isSuccessful()){
-//
-//                            Map messageDocBody = new HashMap();
-//                            messageDocBody.put("message", task.getResult());
-//                            messageDocBody.put("name", fileUri.getLastPathSegment());
-//                            messageDocBody.put("type", checker);
-//                            messageDocBody.put("from", messageSenderID);
-//                            messageDocBody.put("to", messageReceiverID);
-//                            messageDocBody.put("messageID", messagePushID);
-//                            messageDocBody.put("time", saveCurrTime);
-//                            messageDocBody.put("date", saveCurrDate);
-//
-//                            Map messageBodyDetails = new HashMap();
-//                            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageDocBody);
-//                            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageDocBody);
-//
-//                            databaseReference.updateChildren(messageBodyDetails);
-//                            loadingBar.dismiss();
-//                        }
-//                    }
-//                }).addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        loadingBar.dismiss();
-//                        Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-//                    }
-//                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-//                        double p = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-//                        loadingBar.setMessage((int) p + "%" + "uploaded");
-//                    }
-//                });
 
                 uploadTask = filePath.putFile(fileUri);
                 uploadTask.continueWithTask(new Continuation() {
@@ -357,34 +345,33 @@ public class ChatActivity extends AppCompatActivity {
                             my_Url = downloadUri.toString();
 
                             //store docx into firebase Database
-                            Map messageImageBody = new HashMap();
-                            messageImageBody.put("message", my_Url);
-                            messageImageBody.put("name", fileUri.getLastPathSegment());
-                            messageImageBody.put("type", checker);
-                            messageImageBody.put("from", messageSenderID);
-                            messageImageBody.put("to", messageReceiverID);
-                            messageImageBody.put("messageID", messagePushID);
-                            messageImageBody.put("time", saveCurrTime);
-                            messageImageBody.put("date", saveCurrDate);
+                            Map messageTextBody = new HashMap();
+                            messageTextBody.put("message", my_Url);
+                            messageTextBody.put("name", fileUri.getLastPathSegment());
+                            messageTextBody.put("type", checker);
+                            messageTextBody.put("from", messageSenderID);
+                            messageTextBody.put("to", messageReceiverID);
+                            messageTextBody.put("messageID", messagePushID);
+                            messageTextBody.put("time", saveCurrTime);
+                            messageTextBody.put("date", saveCurrDate);
+                            messageTextBody.put("fromName", currUserName);
+                            messageTextBody.put("messageType", "group");
 
                             Map messageBodyDetails = new HashMap();
-                            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageImageBody);
-                            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageImageBody);
+                            messageBodyDetails.put("Groups" + "/" + group.getGroupId() + "/" + "messages" + "/" + messagePushID, messageTextBody);
 
                             databaseReference.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                                 @Override
                                 public void onComplete(@NonNull Task task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(ChatActivity.this, "Image sent successfully", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(GroupActivity.this, "Image sent successfully", Toast.LENGTH_SHORT).show();
                                         loadingBar.dismiss();
 
                                     } else {
-                                        Toast.makeText(ChatActivity.this, "error", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(GroupActivity.this, "error", Toast.LENGTH_SHORT).show();
                                         loadingBar.dismiss();
 
                                     }
-
-                                    // messageInputText.setText(null);
                                 }
                             });
 
@@ -394,7 +381,7 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         loadingBar.dismiss();
-                        Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -404,13 +391,9 @@ public class ChatActivity extends AppCompatActivity {
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                         .child("Image Files");
 
-                final String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
-                final String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
-
-                DatabaseReference userMessageKeyRef = databaseReference.child("Messages")
-                        .child(messageSenderID).child(messageReceiverID).push();
-
-                final String messagePushID = userMessageKeyRef.getKey();
+                DatabaseReference groupReference = databaseReference.child("Groups").child(group.getGroupId())
+                        .child("messages").push();
+                String messagePushID = groupReference.getKey();
 
                 final StorageReference filePath = storageReference.child(messagePushID + "." + "jpg");
                 uploadTask = filePath.putFile(fileUri);
@@ -433,29 +416,30 @@ public class ChatActivity extends AppCompatActivity {
                             my_Url = downloadUri.toString();
 
                             //store image into firebase Database
-                            Map messageImageBody = new HashMap();
-                            messageImageBody.put("message", my_Url);
-                            messageImageBody.put("name", fileUri.getLastPathSegment());
-                            messageImageBody.put("type", checker);
-                            messageImageBody.put("from", messageSenderID);
-                            messageImageBody.put("to", messageReceiverID);
-                            messageImageBody.put("messageID", messagePushID);
-                            messageImageBody.put("time", saveCurrTime);
-                            messageImageBody.put("date", saveCurrDate);
+                            Map messageTextBody = new HashMap();
+                            messageTextBody.put("message", my_Url);
+                            messageTextBody.put("name", fileUri.getLastPathSegment());
+                            messageTextBody.put("type", checker);
+                            messageTextBody.put("from", messageSenderID);
+                            messageTextBody.put("to", messageReceiverID);
+                            messageTextBody.put("messageID", messagePushID);
+                            messageTextBody.put("time", saveCurrTime);
+                            messageTextBody.put("date", saveCurrDate);
+                            messageTextBody.put("fromName", currUserName);
+                            messageTextBody.put("messageType", "group");
 
                             Map messageBodyDetails = new HashMap();
-                            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageImageBody);
-                            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageImageBody);
+                            messageBodyDetails.put("Groups" + "/" + group.getGroupId() + "/" + "messages" + "/" + messagePushID, messageTextBody);
 
                             databaseReference.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                                 @Override
                                 public void onComplete(@NonNull Task task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(ChatActivity.this, "Image sent successfully", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(GroupActivity.this, "Image sent successfully", Toast.LENGTH_SHORT).show();
                                         loadingBar.dismiss();
 
                                     } else {
-                                        Toast.makeText(ChatActivity.this, "error", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(GroupActivity.this, "error", Toast.LENGTH_SHORT).show();
                                         loadingBar.dismiss();
 
                                     }
@@ -475,56 +459,6 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void displayLastSeen() {
-
-        //setting user online state.
-        databaseReference.child("User").child(messageSenderID).child("User_State").child("State")
-                .setValue("Online")
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("state", "updateUserStatus: ");
-
-                    }
-
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                String er = e.getMessage().toString();
-                Log.d("error", "onFailure: " + er);
-            }
-        });
-
-        databaseReference.child("User").child(messageReceiverID)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.child("User_State").hasChild("State")) {
-                            String state = dataSnapshot.child("User_State").child("State").getValue().toString();
-
-                            String date = dataSnapshot.child("User_State").child("Date").getValue().toString();
-                            String time = dataSnapshot.child("User_State").child("Time").getValue().toString();
-
-                            if (state.equals("Online")) {
-                                userLastSeen.setText("Online");
-                            } else if (state.equals("Offline")) {
-                                userLastSeen.setText("Last seen: " + date + " " + time);
-
-                            }
-
-                        } else {
-                            userLastSeen.setText("Offline");
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-    }
-
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -540,13 +474,12 @@ public class ChatActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        databaseReference.child("Messages").child(messageSenderID).child(messageReceiverID)
+        groupReference.child(group.getGroupId()).child("messages")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
                         Messages message = dataSnapshot.getValue(Messages.class);
-
+                        Log.d("list", "onChildAdded: " + message.getMessageID() + " " + message.getName());
                         messageList.add(message);
                         messageAdapter.notifyDataSetChanged();
                         recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount());
@@ -573,7 +506,6 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                 });
-
     }
 
     private void sendMessage() {
@@ -581,13 +513,9 @@ public class ChatActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(messageText)) {
             //
         } else {
-            String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
-            String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
-
-            DatabaseReference userMessageKeyRef = databaseReference.child("Messages")
-                    .child(messageSenderID).child(messageReceiverID).push();
-
-            String messagePushID = userMessageKeyRef.getKey();
+            DatabaseReference groupReference = databaseReference.child("Groups").child(group.getGroupId())
+                .child("messages").push();
+            String messagePushID = groupReference.getKey();
 
             Map messageTextBody = new HashMap();
             messageTextBody.put("message", messageText);
@@ -597,27 +525,26 @@ public class ChatActivity extends AppCompatActivity {
             messageTextBody.put("messageID", messagePushID);
             messageTextBody.put("time", saveCurrTime);
             messageTextBody.put("date", saveCurrDate);
+            messageTextBody.put("fromName", currUserName);
+            messageTextBody.put("messageType", "group");
 
             Map messageBodyDetails = new HashMap();
-            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
-            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageTextBody);
+            messageBodyDetails.put("Groups" + "/" + group.getGroupId() + "/" + "messages" + "/" + messagePushID, messageTextBody);
 
             databaseReference.updateChildren(messageBodyDetails).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
                     if (task.isSuccessful()) {
-                        Toast.makeText(ChatActivity.this, "message sent successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupActivity.this, "message sent successfully", Toast.LENGTH_SHORT).show();
 
                     } else {
-                        Toast.makeText(ChatActivity.this, "error", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupActivity.this, "error", Toast.LENGTH_SHORT).show();
 
                     }
 
                     messageInputText.setText(null);
                 }
             });
-
-
         }
 
     }

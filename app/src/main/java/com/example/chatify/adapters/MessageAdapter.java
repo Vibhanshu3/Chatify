@@ -105,8 +105,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 holder.senderText.setBackgroundResource(R.drawable.sender_messages_layout);
                 holder.senderText.setTextColor(Color.BLACK);
-                holder.senderText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
 
+                if(messages.getMessageType() == "group"){
+                    holder.senderText.setText(messages.getFromName() +"\n" + messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+
+                }else {
+                    holder.senderText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+                }
             } else {
                 Log.d("inrec", "onBindViewHolder: " + "text");
 
@@ -115,8 +120,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 holder.receiverText.setBackgroundResource(R.drawable.receiver_messages_layout);
                 holder.receiverText.setTextColor(Color.BLACK);
-                holder.receiverText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+                if(messages.getMessageType() == "group"){
+                    holder.receiverText.setText(messages.getFromName() +"\n" + messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
 
+                }else {
+                    holder.receiverText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+                }
             }
         } else if(fromMesstype.equals("image")) {
             holder.receiverText.setVisibility(View.INVISIBLE);
