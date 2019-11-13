@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         list = new ArrayList<>();
 
         if (user != null) {
+            init();
             updateUserStatus("Online");
 
             //for search.
@@ -185,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             });
 
         }
-        init();
     }
 
     private void init() {
