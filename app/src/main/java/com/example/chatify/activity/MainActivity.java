@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     List<String> list;
     private SearchAdapter searchAdapter;
+    private RelativeLayout relativeLayout;
 
     private RecyclerView userRecView;
     int tag =0;
@@ -136,20 +138,16 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             myTabLayout = findViewById(R.id.main_tabs);
             myTabLayout.setupWithViewPager(myViewPager);
 
+        }else {
+
         }
-            userRecView = findViewById(R.id.user_rec_view);
-            userRecView.setHasFixedSize(true);
-            userRecView.setLayoutManager(new LinearLayoutManager(this));
-
-            searchAdapter = new SearchAdapter(MainActivity.this, list);
-            userRecView.setAdapter(searchAdapter);
-
 
         mauth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         user = mauth.getCurrentUser();
 
         list = new ArrayList<>();
+        relativeLayout = findViewById(R.id.search_relative_layout);
 
         if (user != null) {
             init();
@@ -167,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 String username = dataSnapshot.child("User_Name").getValue().toString();
                                 list.add(username);
+                                Log.d("listlist", "onDataChange: " + list);
 
                             }
 
@@ -184,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
                 }
             });
+//            userRecView.setLayoutManager(new LinearLayoutManager(this));
 
         }
     }
@@ -297,6 +297,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
             case R.id.main_menu_search:
                 tag=1;
+                relativeLayout.setVisibility(View.VISIBLE);
+                userRecView = findViewById(R.id.user_rec_view);
+                userRecView.setHasFixedSize(true);
+                searchAdapter = new SearchAdapter(MainActivity.this, list);
+                userRecView.setAdapter(searchAdapter);
+                userRecView.setLayoutManager(new LinearLayoutManager(this));
                 return true;
 
             case R.id.main_menu_logout:
@@ -392,7 +398,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         Log.d("newlist", "onQueryTextChange: " + newList);
 
         searchAdapter.updateList(newList);
-
 
         return true;
     }

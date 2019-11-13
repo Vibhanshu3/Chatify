@@ -114,7 +114,6 @@ public class ChatActivity extends AppCompatActivity {
 
         //chat input functions
         sendMessageBtn = findViewById(R.id.send_msg_btn);
-        sendFilesBtn = findViewById(R.id.send_files_btn);
         messageInputText = findViewById(R.id.input_msg);
 
         username.setText(messageReceiverName);
@@ -134,61 +133,7 @@ public class ChatActivity extends AppCompatActivity {
         saveCurrTime = currTime.format(calender.getTime());
         loadingBar = new ProgressDialog(this);
 
-        //send message button.
-        sendFilesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CharSequence options[] = new CharSequence[]
-                        {
-                                "Images",
-                                "PDF Files",
-                                "Ms word Files"
-                        };
-                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
-                builder.setTitle("Select the files");
-
-                builder.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
-                            checker = "image";
-
-                            //send to phone gallery
-                            Intent intent = new Intent();
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            intent.setType("image/*");
-                            startActivityForResult(intent.createChooser(intent, "Select Image"), 438);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-                        }
-                        if (which == 1) {
-                            checker = "pdf";
-
-                            //send to file manager.
-                            Intent intent = new Intent();
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            intent.setType("application/*");
-                            startActivityForResult(intent.createChooser(intent, "Select PDF file"), 438);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-                        }
-
-                        if (which == 2) {
-                            checker = "docx";
-
-                            //send to file manager.
-                            Intent intent = new Intent();
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            intent.setType("application/*");
-                            startActivityForResult(intent.createChooser(intent, "Select Ms word file"), 438);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-                        }
-                    }
-                });
-                builder.show();
-            }
-        });
+        //send message button.;
 
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -35,13 +35,23 @@
 
 
         <!--&lt;!&ndash;search rec view&ndash;&gt;-->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/user_rec_view"
+        <RelativeLayout
+            android:id="@+id/search_relative_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize">
+            android:layout_marginTop="?attr/actionBarSize"
+            android:visibility="invisible"
+            android:background="@color/fui_bgAnonymous">
 
-        </androidx.recyclerview.widget.RecyclerView>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/user_rec_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+            </androidx.recyclerview.widget.RecyclerView>
+        </RelativeLayout>
+
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/main_tabs_pager"
