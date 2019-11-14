@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.chatify.R;
+import com.example.chatify.model.Comment;
 import com.example.chatify.model.Post;
 import com.example.chatify.model.User;
 import com.example.chatify.view.CommunityView;
@@ -22,6 +23,7 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.chatify.utils.AppConst.DB_POSTS_COMMENTS;
 import static com.example.chatify.utils.AppConst.DB_POSTS_KEY;
 import static com.example.chatify.utils.AppConst.DB_POSTS_LIKE;
 import static com.example.chatify.utils.AppConst.DB_POSTS_LIKE_COUNT;
@@ -53,6 +55,49 @@ public class CommunityPresenter {
         storageReference = FirebaseStorage.getInstance().getReference();
     }
 
+    public void comment(String postKey, String date, String time, String message, User user) {
+        if (message == null || message.isEmpty()) {
+            view.hideLoader();
+            view.error(R.string.error_comment_empty);
+            return;
+        }
+        
+        DatabaseReference post = databaseReference.child(DB_POSTS_KEY).child(postKey);
+
+        post.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Post p = dataSnapshot.getValue(Post.class);
+                    if (p != null) {
+                        List<Comment> comments = p.getComments();
+                        if (comments == null) {
+                            comments = new ArrayList<>();
+                        }
+
+                        Comment comment = new Comment(date, time, message, firebaseUser.getUid(), user.getUser_Name(), user.getUser_Thumb_Image());
+                        comments.add(comment);
+
+                        post.child(DB_POSTS_COMMENTS)
+                                .setValue(comments)
+                                .addOnSuccessListener(aVoid -> view.commentSuccess(comment))
+                                .addOnFailureListener(e -> {
+                                    view.hideLoader();
+                                    view.error(R.string.error_something_wrong);
+                                });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                view.error(R.string.error_something_wrong);
+                Log.e(LOG_COMMUNITY, databaseError.getDetails());
+            }
+        });
+
+    }
+
     public void like(String postKey) {
         DatabaseReference post = databaseReference.child(DB_POSTS_KEY).child(postKey);
 
@@ -76,14 +121,14 @@ public class CommunityPresenter {
                         post.child(DB_POSTS_LIKE)
                                 .setValue(users)
                                 .addOnFailureListener(e -> {
-                                    view.postError(R.string.error_something_wrong);
+                                    view.error(R.string.error_something_wrong);
                                     Log.e(LOG_COMMUNITY, e.getMessage());
                                 });
 
                         post.child(DB_POSTS_LIKE_COUNT)
                                 .setValue(users.size())
                                 .addOnFailureListener(e -> {
-                                    view.postError(R.string.error_something_wrong);
+                                    view.error(R.string.error_something_wrong);
                                     Log.e(LOG_COMMUNITY, e.getMessage());
                                 });
                     }
@@ -92,7 +137,7 @@ public class CommunityPresenter {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                view.postError(R.string.error_something_wrong);
+                view.error(R.string.error_something_wrong);
                 Log.e(LOG_COMMUNITY, databaseError.getDetails());
             }
         });
@@ -100,9 +145,11 @@ public class CommunityPresenter {
 
     public void createPost(User user, String title, String description, String date, String time, Uri image) {
         if (title.isEmpty()) {
-            view.postError(R.string.error_empty_title);
+            view.hideLoader();
+            view.error(R.string.error_empty_title);
         } else if (description.isEmpty()) {
-            view.postError(R.string.error_empty_description);
+            view.hideLoader();
+            view.error(R.string.error_empty_description);
         } else {
             postReference = databaseReference.child(DB_POSTS_KEY).push();
 
@@ -153,7 +200,8 @@ public class CommunityPresenter {
         postReference
                 .setValue(post)
                 .addOnFailureListener(e -> {
-                    view.postError(R.string.error_something_wrong);
+                    view.error(R.string.error_something_wrong);
+                    view.hideLoader();
                     Log.e(LOG_COMMUNITY, e.getMessage());
                 }).addOnSuccessListener(aVoid -> {
             List<String> posts;
@@ -173,7 +221,8 @@ public class CommunityPresenter {
                     .setValue(posts)
                     .addOnSuccessListener(aVoid1 -> view.postSuccess(user))
                     .addOnFailureListener(e -> {
-                        view.postError(R.string.error_something_wrong);
+                        view.hideLoader();
+                        view.error(R.string.error_something_wrong);
                         Log.e(LOG_COMMUNITY, e.getMessage());
                     });
         });

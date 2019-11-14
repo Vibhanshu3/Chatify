@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_large"
-        android:text="New" />
+        android:text="@string/new_post" />
 
     <Button
         android:id="@+id/community_trending_post"
@@ -18,7 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="@dimen/spacing_large"
-        android:text="@string/trending" />
+        android:text="@string/trending"
+        tools:ignore="RelativeOverlap" />
 
     <include
         layout="@layout/layout_recycler_view"

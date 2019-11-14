@@ -13,6 +13,7 @@ public class Post {
     private String userName;
     private String userImage;
     private List<String> like;
+    private List<Comment> comments;
 
     public Post() {
     }
@@ -107,5 +108,13 @@ public class Post {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

@@ -9,15 +9,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,7 +32,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatify.R;
+import com.example.chatify.adapters.CommentAdapter;
 import com.example.chatify.adapters.PostAdapter;
+import com.example.chatify.model.Comment;
 import com.example.chatify.model.Post;
 import com.example.chatify.model.User;
 import com.example.chatify.presenter.CommunityPresenter;
@@ -68,8 +73,8 @@ import static com.example.chatify.utils.AppConst.REQUEST_CODE_PERMISSION_STORAGE
 //TODO: add comments
 //TODO: add groups or category
 //TODO: add tags
-//FixMe: floating action button location
 //FixMe: call addImage after permission granted
+//FixMe: (suggestion) comment can have valueEventListener
 
 public class CommunityFragment extends Fragment implements CommunityView, View.OnClickListener, PostAdapter.ClickListener, ValueEventListener {
     @BindView(R.id.recycler_view)
@@ -100,6 +105,7 @@ public class CommunityFragment extends Fragment implements CommunityView, View.O
 
     private CommunityPresenter presenter;
     private PostAdapter adapter;
+    private CommentAdapter commentAdapter;
 
     public CommunityFragment() {
     }
@@ -209,8 +215,12 @@ public class CommunityFragment extends Fragment implements CommunityView, View.O
     }
 
     @Override
-    public void postError(int error) {
+    public void hideLoader() {
         dialogLoader.setVisibility(GONE);
+    }
+
+    @Override
+    public void error(int error) {
         Toast.makeText(context, error, LENGTH_LONG).show();
     }
 
@@ -219,6 +229,75 @@ public class CommunityFragment extends Fragment implements CommunityView, View.O
         dialog.dismiss();
         Toast.makeText(context, "Success", LENGTH_LONG).show();
         AppSharedPreferences.setUser(context, user);
+    }
+
+    @Override
+    public void commentSuccess(Comment comment) {
+        hideLoader();
+        dialogTitle.setText("");
+        commentAdapter.add(comment);
+    }
+
+    @Override
+    public void like(String postKey) {
+        presenter.like(postKey);
+    }
+
+    @Override
+    public void comments(String postKey, List<Comment> comments) {
+        dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_comments);
+
+        Window window = dialog.getWindow();
+
+        if (window != null) {
+            window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        }
+
+        commentAdapter = new CommentAdapter(comments);
+        RecyclerView commentList = dialog.findViewById(R.id.recycler_view);
+        dialogTitle = dialog.findViewById(R.id.dialog_comment);
+        dialogLoader = dialog.findViewById(R.id.loader);
+
+        dialogTitle.setOnEditorActionListener((v, actionId, event) -> {
+            if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                dialogLoader.setVisibility(VISIBLE);
+                presenter.comment(
+                        postKey,
+                        String.format(Locale.getDefault(),"%1$tA %1$tb %1$td %1$tY", Calendar.getInstance()),
+                        String.format("%1$tI:%1$tM %1$Tp", Calendar.getInstance()),
+                        dialogTitle.getText().toString(),
+                        AppSharedPreferences.getUser(context)
+                );
+            }
+            return false;
+        });
+
+        commentList.setLayoutManager(new LinearLayoutManager(context));
+        commentList.setAdapter(commentAdapter);
+
+        dialog.show();
+    }
+
+    @Override
+    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        if (dataSnapshot.exists()) {
+            List<Post> posts = new ArrayList<>();
+            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                Post post = snapshot.getValue(Post.class);
+                if (post != null) {
+                    post.setKey(snapshot.getKey());
+                    posts.add(post);
+                }
+            }
+            adapter.update(posts);
+        }
+    }
+
+    @Override
+    public void onCancelled(@NonNull DatabaseError databaseError) {
+        Toast.makeText(context, R.string.error_something_wrong, LENGTH_SHORT).show();
+        Log.e(LOG_COMMUNITY, databaseError.getDetails());
     }
 
     @OnClick(R.id.community_new_post)
@@ -246,36 +325,6 @@ public class CommunityFragment extends Fragment implements CommunityView, View.O
         dialog.show();
     }
 
-    private void addImage() {
-        CropImage.activity().start(context);
-    }
-
-    @Override
-    public void like(String postKey) {
-        presenter.like(postKey);
-    }
-
-    @Override
-    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-        if (dataSnapshot.exists()) {
-            List<Post> posts = new ArrayList<>();
-            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                Post post = snapshot.getValue(Post.class);
-                if (post != null) {
-                    post.setKey(snapshot.getKey());
-                    posts.add(post);
-                }
-            }
-            adapter.update(posts);
-        }
-    }
-
-    @Override
-    public void onCancelled(@NonNull DatabaseError databaseError) {
-        Toast.makeText(context, R.string.error_something_wrong, LENGTH_SHORT).show();
-        Log.e(LOG_COMMUNITY, databaseError.getDetails());
-    }
-
     @OnClick(R.id.community_trending_post)
     void trendingPost() {
         if (trending) {
@@ -289,7 +338,11 @@ public class CommunityFragment extends Fragment implements CommunityView, View.O
             query.removeEventListener(this);
             query = postsRef.orderByChild(DB_POSTS_LIKE_COUNT);
             query.addValueEventListener(this);
-            trendingButton.setText("Latest");
+            trendingButton.setText(R.string.latest);
         }
+    }
+
+    private void addImage() {
+        CropImage.activity().start(context);
     }
 }
