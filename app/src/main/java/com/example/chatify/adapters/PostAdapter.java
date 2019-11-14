@@ -5,12 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatify.R;
+import com.example.chatify.model.Comment;
 import com.example.chatify.model.Post;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
@@ -30,6 +32,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public interface ClickListener {
         void like(String postKey);
+        void comments(String postKey, List<Comment> comments);
     }
 
     public PostAdapter(ClickListener clickListener) {
@@ -51,18 +54,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         view.title.setText(post.getTitle());
         view.description.setText(post.getDescription());
         view.time.setText(String.format("%s %s", post.getDate(), post.getTime()));
-        view.like.setImageResource(R.drawable.ic_un_liked);
+        view.likeIcon.setImageResource(R.drawable.ic_un_liked);
 
         String like = "0";
         if (post.getLike() != null && FirebaseAuth.getInstance().getCurrentUser() != null) {
             like = String.valueOf(post.getLike().size());
             if (post.getLike().contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                view.like.setImageResource(R.drawable.ic_liked);
+                view.likeIcon.setImageResource(R.drawable.ic_liked);
             }
         }
+
+        String comment = "0";
+        if (post.getComments() != null) {
+            comment = String.valueOf(post.getComments().size());
+        }
+
         view.likes.setText(like);
+        view.comments.setText(comment);
 
         view.like.setOnClickListener(v -> clickListener.like(post.getKey()));
+        view.comment.setOnClickListener(v -> clickListener.comments(post.getKey(), post.getComments()));
 
         if (post.getImage() != null) {
             view.image.setVisibility(VISIBLE);
@@ -92,7 +103,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         @BindView(R.id.post_image)
         ImageView image;
         @BindView(R.id.post_like_icon)
-        ImageView like;
+        ImageView likeIcon;
+
+        @BindView(R.id.post_like_click)
+        LinearLayout like;
+        @BindView(R.id.post_comments_click)
+        LinearLayout comment;
 
         @BindView(R.id.post_author_name)
         TextView author;
@@ -104,6 +120,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         TextView time;
         @BindView(R.id.post_likes_count)
         TextView likes;
+        @BindView(R.id.post_comments_count)
+        TextView comments;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);

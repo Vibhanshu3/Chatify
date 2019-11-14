@@ -16,4 +16,8 @@
     <string name="description_comment_icon">Comment Icon</string>
     <string name="description_like_icon">Like Icon</string>
     <string name="trending">Trending</string>
+    <string name="latest">Latest</string>
+    <string name="new_post">New Post</string>
+    <string name="write_a_comment">Write a comment</string>
+    <string name="error_comment_empty">Comment can\'t be empty</string>
 </resources>

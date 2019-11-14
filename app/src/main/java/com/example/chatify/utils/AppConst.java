@@ -14,6 +14,7 @@ public class AppConst {
     public static final String DB_POSTS_KEY = "Posts";
     public static final String DB_POSTS_LIKE = "like";
     public static final String DB_POSTS_LIKE_COUNT = "likeCount";
+    public static final String DB_POSTS_COMMENTS = "comments";
 
     public static final String DB_GROUPS_KEY = "Groups";
     public static final String DB_GROUPS_ROLE_ADMIN = "Admin";
