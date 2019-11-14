@@ -1,6 +1,8 @@
 package com.example.chatify.utils;
 
 public class AppConst {
+    public static final int REQUEST_CODE_PERMISSION_STORAGE = 701;
+
     public static final String DB_USERS_KEY = "User";
     public static final String DB_USERS_TOKEN = "Device_Token";
     public static final String DB_USERS_GROUPS = "groups";
@@ -10,10 +12,15 @@ public class AppConst {
     public static final String DB_CONTACTS_KEY = "Contacts";
 
     public static final String DB_POSTS_KEY = "Posts";
+    public static final String DB_POSTS_LIKE = "like";
+    public static final String DB_POSTS_LIKE_COUNT = "likeCount";
 
     public static final String DB_GROUPS_KEY = "Groups";
     public static final String DB_GROUPS_ROLE_ADMIN = "Admin";
     public static final String DB_GROUPS_ROLE_MEMBER = "Member";
+
+    public static final String STORAGE_IMAGE_TYPE = ".jpg";
+    public static final String STORAGE_COMMUNITY_IMAGE = "CommunityImage";
 
     public static final String LOG_MAIN = "mainActivity";
     public static final String LOG_LOGIN = "loginActivity";
