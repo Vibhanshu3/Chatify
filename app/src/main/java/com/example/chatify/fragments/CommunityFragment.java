@@ -73,7 +73,6 @@ import static com.example.chatify.utils.AppConst.REQUEST_CODE_PERMISSION_STORAGE
 //TODO: add comments
 //TODO: add groups or category
 //TODO: add tags
-//FixMe: call addImage after permission granted
 //FixMe: (suggestion) comment can have valueEventListener
 
 public class CommunityFragment extends Fragment implements CommunityView, View.OnClickListener, PostAdapter.ClickListener, ValueEventListener {
