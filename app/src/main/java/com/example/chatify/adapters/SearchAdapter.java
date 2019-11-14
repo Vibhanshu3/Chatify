@@ -39,13 +39,15 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             String name = list.get(position);
+        Log.d("userlist2", "SearchAdapter: " + list);
 
+        Log.d("name123", "onBindViewHolder: " + name);
             holder.name.setText(name);
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return list.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -59,7 +61,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     public void updateList(List<String> newList){
         list = new ArrayList<>();
+        Log.d("name", "onBindViewHolder: " + newList);
+
         list.addAll(newList);
+        Log.d("name4", "onBindViewHolder: " + list);
+
         notifyDataSetChanged();
 
     }
