@@ -5,17 +5,26 @@
     android:layout_height="match_parent"
     tools:context=".fragments.CommunityFragment">
 
-    <include layout="@layout/layout_recycler_view" />
-
-    <include layout="@layout/layout_loader" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <Button
         android:id="@+id/community_new_post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_large"
+        android:text="New" />
+
+    <Button
+        android:id="@+id/community_trending_post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="80dp"
-        android:src="@drawable/ic_create" />
+        android:layout_marginEnd="@dimen/spacing_large"
+        android:text="@string/trending" />
+
+    <include
+        layout="@layout/layout_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/community_trending_post" />
+
+    <include layout="@layout/layout_loader" />
 </RelativeLayout>

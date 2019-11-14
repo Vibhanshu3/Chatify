@@ -111,8 +111,7 @@
                     android:layout_height="@dimen/spacing_mlarge"
                     android:layout_marginEnd="@dimen/spacing_middle"
                     android:contentDescription="@string/description_like_icon"
-                    android:tint="@color/grey_600"
-                    app:srcCompat="@drawable/ic_thumb_up" />
+                    app:srcCompat="@drawable/ic_un_liked" />
 
                 <TextView
                     android:id="@+id/post_likes_count"

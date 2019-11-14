@@ -1,6 +1,7 @@
 package com.example.chatify.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -29,6 +31,7 @@ import com.example.chatify.adapters.GroupsAdapter;
 import com.example.chatify.adapters.SearchAdapter;
 import com.example.chatify.adapters.TabsAccessorAdapter;
 import com.example.chatify.AllUserActivity;
+import com.example.chatify.fragments.CommunityFragment;
 import com.example.chatify.utils.AppUtils;
 import com.example.chatify.model.Contact;
 import com.example.chatify.R;
@@ -319,6 +322,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
             default:
                 return false;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        for (Fragment fragment : fragments) {
+            if(fragment instanceof CommunityFragment) {
+                fragment.onActivityResult(requestCode, resultCode, data);
+            }
         }
     }
 

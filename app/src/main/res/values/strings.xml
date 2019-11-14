@@ -15,4 +15,5 @@
     <string name="description_post_image">Post Image</string>
     <string name="description_comment_icon">Comment Icon</string>
     <string name="description_like_icon">Like Icon</string>
+    <string name="trending">Trending</string>
 </resources>

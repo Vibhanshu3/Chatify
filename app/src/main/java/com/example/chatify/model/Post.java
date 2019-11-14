@@ -1,6 +1,9 @@
 package com.example.chatify.model;
 
+import java.util.List;
+
 public class Post {
+    private String key;
     private String title;
     private String description;
     private String date;
@@ -9,11 +12,12 @@ public class Post {
     private String userId;
     private String userName;
     private String userImage;
+    private List<String> like;
 
     public Post() {
     }
 
-    public Post(String title, String description, String date, String time, String image, String userId, String userName, String userImage) {
+    public Post(String title, String description, String date, String time, String image, String userId, String userName, String userImage, List<String> like) {
         this.title = title;
         this.description = description;
         this.date = date;
@@ -22,6 +26,15 @@ public class Post {
         this.userId = userId;
         this.userName = userName;
         this.userImage = userImage;
+        this.like = like;
+    }
+
+    public List<String> getLike() {
+        return like;
+    }
+
+    public void setLike(List<String> like) {
+        this.like = like;
     }
 
     public String getTitle() {
@@ -86,5 +99,13 @@ public class Post {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
