@@ -15,7 +15,7 @@
     android:layout_width="match_parent"
     android:layout_height="350dp"
     android:orientation="vertical"
-    android:background="@color/start_blue"
+    android:background="#02D0CC"
     android:id="@+id/ll1">
  <TextView
 
