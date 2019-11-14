@@ -18,6 +18,7 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
@@ -30,6 +31,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.chatify.ChatActivity;
 import com.example.chatify.GroupActivity;
+import com.example.chatify.RequestActivity;
 import com.example.chatify.adapters.ContactAdapter;
 import com.example.chatify.adapters.GroupsAdapter;
 import com.example.chatify.adapters.SearchAdapter;
@@ -111,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     private RecyclerView userRecView;
     int tag =0;
+
+    private TextView badgecounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -292,6 +296,48 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setOnQueryTextListener(this);
 
+        MenuItem menuItem1 = menu.findItem(R.id.main_menu_request);
+
+        databaseReference.child("Chat Request").child(currentUser)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Log.d("badgecount", "onDataChange: " + dataSnapshot.getChildrenCount());
+                        String count = String.valueOf(dataSnapshot.getChildrenCount());
+                        if(!count.equals("0")) {
+                            menuItem1.setActionView(R.layout.request_badge);
+                            View view = menuItem1.getActionView();
+                            badgecounter = view.findViewById(R.id.badge_counter);
+                            badgecounter.setText(count);
+                        }
+                        else
+                            menuItem1.setActionView(null);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.getItemId() == R.id.main_menu_request) {
+                Log.d("clickwork", "onCreateOptionsMenu: " + "clickwork" );
+                View view = item.getActionView();
+                if (view != null) {
+                    Log.d("clickwork", "onCreateOptionsMenu: " + "clickwork" + view);
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(MainActivity.this, RequestActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+                }
+            }
+        }
+
         return true;
     }
 
@@ -308,6 +354,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 searchAdapter = new SearchAdapter(MainActivity.this, list);
                 userRecView.setAdapter(searchAdapter);
                 userRecView.setLayoutManager(new LinearLayoutManager(this));
+                return true;
+
+            case R.id.main_menu_request:
+                Intent intent = new Intent(MainActivity.this, RequestActivity.class);
+                startActivity(intent);
                 return true;
 
             case R.id.main_menu_logout:

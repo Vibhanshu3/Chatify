@@ -70,5 +70,7 @@ dependencies {
 
     //Json for shared Preference
     implementation 'com.google.code.gson:gson:2.8.5'
+
+
 }
 apply plugin: 'com.google.gms.google-services'

@@ -11,6 +11,13 @@
         />
 
     <item
+        android:id="@+id/main_menu_request"
+        android:icon="@drawable/ic_request_image"
+        app:showAsAction="always"
+        android:actionLayout="@layout/request_badge"
+        android:title="TODO" />
+
+    <item
         android:id="@+id/main_menu_Users"
         android:title="Find Friend" />
     <item
