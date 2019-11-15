@@ -1,15 +1,9 @@
 package com.example.chatify.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +15,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -29,23 +27,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.chatify.ChatActivity;
+import com.example.chatify.AllUserActivity;
 import com.example.chatify.GroupActivity;
+import com.example.chatify.R;
 import com.example.chatify.RequestActivity;
+import com.example.chatify.SettingActivity2;
 import com.example.chatify.adapters.ContactAdapter;
 import com.example.chatify.adapters.GroupsAdapter;
 import com.example.chatify.adapters.SearchAdapter;
 import com.example.chatify.adapters.TabsAccessorAdapter;
-import com.example.chatify.AllUserActivity;
 import com.example.chatify.fragments.CommunityFragment;
-import com.example.chatify.utils.AppUtils;
 import com.example.chatify.model.Contact;
-import com.example.chatify.R;
-import com.example.chatify.SettingActivity2;
 import com.example.chatify.model.Group;
 import com.example.chatify.model.GroupMember;
 import com.example.chatify.model.User;
 import com.example.chatify.presenter.MainActivityPresenter;
+import com.example.chatify.utils.AppUtils;
 import com.example.chatify.view.MainActivityView;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -59,7 +56,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -125,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         mtoolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mtoolbar);
-        getSupportActionBar().setTitle("Chatify");
+        getSupportActionBar().setTitle(R.string.app_name);
 
         //setting navigation drawer.
         drawerLayout = findViewById(R.id.main_layout);
@@ -309,6 +305,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                             View view = menuItem1.getActionView();
                             badgecounter = view.findViewById(R.id.badge_counter);
                             badgecounter.setText(count);
+                            view.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, RequestActivity.class)));
                         }
                         else
                             menuItem1.setActionView(null);
@@ -319,25 +316,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
                     }
                 });
-
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            if (item.getItemId() == R.id.main_menu_request) {
-                Log.d("clickwork", "onCreateOptionsMenu: " + "clickwork" );
-                View view = item.getActionView();
-                if (view != null) {
-                    Log.d("clickwork", "onCreateOptionsMenu: " + "clickwork" + view);
-                    view.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(MainActivity.this, RequestActivity.class);
-                            startActivity(intent);
-                        }
-                    });
-                }
-            }
-        }
-
         return true;
     }
 
@@ -354,11 +332,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 searchAdapter = new SearchAdapter(MainActivity.this, list);
                 userRecView.setAdapter(searchAdapter);
                 userRecView.setLayoutManager(new LinearLayoutManager(this));
-                return true;
-
-            case R.id.main_menu_request:
-                Intent intent = new Intent(MainActivity.this, RequestActivity.class);
-                startActivity(intent);
                 return true;
 
             case R.id.main_menu_logout:

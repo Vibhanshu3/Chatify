@@ -24,6 +24,8 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+//FixME: fix view after request update
+
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
     private Context context;
@@ -37,7 +39,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         this.list = list;
         Log.d("userlist", "SearchAdapter: " + list);
         mauth = FirebaseAuth.getInstance();
-        currUserID = mauth.getCurrentUser().toString();
+        currUserID = mauth.getCurrentUser().getUid();
         chatRequestReference = FirebaseDatabase.getInstance().getReference().child("Chat Request");
 
     }

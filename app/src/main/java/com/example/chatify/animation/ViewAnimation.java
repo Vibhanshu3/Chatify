@@ -1,3 +1,5 @@
+package com.example.chatify.animation;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.view.View;
