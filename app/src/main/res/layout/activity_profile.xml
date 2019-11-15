@@ -1,26 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ProfileActivity"
-    android:background="@drawable/gradient_shape">
+    android:background="@color/grey_light"
+    android:orientation="vertical"
+    >
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="400dp">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="350dp"
+    android:orientation="vertical"
+    android:background="#02D0CC"
+    android:id="@+id/ll1">
+ <TextView
 
+     android:id="@+id/profile_status"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_gravity="center_horizontal"
+     android:text="User Status"
+     android:textColor="@android:color/white"
+     android:layout_below="@id/profile_Image"
+     android:layout_marginTop="25dp"
+     android:textAlignment="center"
+     android:textSize="20sp"
+     android:elevation="22sp"
+     />
 
- <View
-     android:layout_width="match_parent"
-     android:layout_height="200dp"
-     android:background="@drawable/fb_image">
- </View>
 
  <de.hdodenhof.circleimageview.CircleImageView
      android:id="@+id/profile_Image"
-     android:layout_width="156dp"
-     android:layout_height="165dp"
+     android:layout_width="150dp"
+     android:layout_height="150dp"
      android:layout_alignParentTop="true"
      android:layout_centerHorizontal="true"
-     android:layout_marginTop="110dp"
+     android:layout_marginTop="45dp"
+     android:layout_gravity="center_horizontal"
      android:src="@drawable/profile_image"
      app:civ_border_width="2dp"
      app:civ_border_color="#FF000000"
@@ -28,34 +48,135 @@
 
  <TextView
      android:id="@+id/profile_name"
-     android:layout_width="match_parent"
+     android:layout_width="wrap_content"
      android:layout_height="wrap_content"
      android:text="User Name"
-     android:textColor="@android:color/white"
+     android:layout_gravity="center_horizontal"
+     android:textColor="#fff"
      android:layout_below="@id/profile_Image"
-     android:layout_marginLeft="15dp"
-     android:layout_marginRight="15dp"
-     android:layout_marginTop="5dp"
-     android:textAlignment="center"
+     android:layout_marginTop="10dp"
      android:textSize="20sp"
      android:textStyle="bold"
-     android:elevation="22sp"
      />
 
- <TextView
-     android:id="@+id/profile_status"
+
+
+
+</LinearLayout>
+<androidx.cardview.widget.CardView
+    android:layout_width="320dp"
+    android:layout_height="120dp"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="300dp"
+    >
+ <LinearLayout
      android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="horizontal"
+     android:weightSum="3">
+  <LinearLayout
+      android:gravity="center"
+      android:orientation="vertical"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:layout_height="match_parent">
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Photos"
+       android:textSize="20sp"
+       />
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="125"
+       android:textStyle="bold"
+       android:textSize="20sp"
+       android:paddingTop="10dp"
+       android:textColor="@color/start_blue"/>
+
+  </LinearLayout>
+  <LinearLayout
+      android:gravity="center"
+      android:orientation="vertical"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:layout_height="match_parent">
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Followers"
+       android:textSize="20sp"
+       />
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="1205"
+       android:textStyle="bold"
+       android:textSize="20sp"
+       android:paddingTop="10dp"
+       android:textColor="@color/start_blue"/>
+
+  </LinearLayout>
+  <LinearLayout
+      android:gravity="center"
+      android:orientation="vertical"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:layout_height="match_parent">
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Following"
+       android:textSize="20sp"
+       />
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="360"
+       android:textStyle="bold"
+       android:textSize="20sp"
+       android:paddingTop="10dp"
+       android:textColor="@color/start_blue"/>
+
+  </LinearLayout>
+ </LinearLayout>
+
+
+
+</androidx.cardview.widget.CardView>
+</RelativeLayout>
+ <LinearLayout
+     android:layout_width="360dp"
      android:layout_height="wrap_content"
-     android:text="User Status"
-     android:textColor="@android:color/white"
-     android:layout_below="@id/profile_Image"
-     android:layout_marginLeft="15dp"
-     android:layout_marginRight="15dp"
-     android:layout_marginTop="25dp"
-     android:textAlignment="center"
-     android:textSize="18sp"
-     android:elevation="22sp"
-     />
+     android:orientation="vertical"
+     android:layout_gravity="center"
+     android:layout_marginTop="10dp"
+     >
+
+  <LinearLayout
+
+      android:orientation="horizontal"
+      android:paddingLeft="25dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      >
+   <ImageView
+       android:layout_width="36dp"
+       android:layout_height="36dp"
+       android:src="@drawable/ic_perm_phone_msg_black_24dp"/>
+   <TextView
+       android:textStyle="bold"
+
+       android:layout_gravity="center_vertical"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:paddingLeft="20dp"
+       android:text="+91 9818897758"/>
+  </LinearLayout>
+
+
+ </LinearLayout>
 
  <Button
      android:id="@+id/send_message_btn"
@@ -70,6 +191,7 @@
      android:textSize="20sp"
      android:text="Send Request"
      android:background="@drawable/element_outline"
+
      android:elevation="20dp"
      />
 
@@ -89,4 +211,6 @@
      android:background="@drawable/element_outline"/>
 
 
-</RelativeLayout>
+
+
+</LinearLayout>
