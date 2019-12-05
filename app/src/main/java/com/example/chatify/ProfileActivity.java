@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.chatify.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,6 +24,10 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.example.chatify.utils.AppConst.DB_CONTACTS_CONTACT;
+import static com.example.chatify.utils.AppConst.DB_CONTACTS_SAVED;
+import static com.example.chatify.utils.AppConst.DB_USERS_TYPE_BOT;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private Button sendMessageReqBtn, declineMessageReqBtn;
@@ -35,6 +40,8 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference databaseReference, chatReqReference, contactsReference, notificationReference;
     private FirebaseAuth mauth;
     private String senderUserID, currState;
+
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +77,7 @@ public class ProfileActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        user = dataSnapshot.getValue(User.class);
                         if (dataSnapshot.exists() && dataSnapshot.hasChild("User_Image")) {
                             String username = dataSnapshot.child("User_Name").getValue().toString();
                             String status = dataSnapshot.child("User_Status").getValue().toString();
@@ -181,7 +189,11 @@ public class ProfileActivity extends AppCompatActivity {
                     sendMessageReqBtn.setEnabled(false);
                     
                     if(currState.equals("new")){
-                        sendChatRequest();
+                        if (user.getUserType() != null && user.getUserType().equals(DB_USERS_TYPE_BOT)) {
+                            addBot();
+                        } else {
+                            sendChatRequest();
+                        }
                     }
                     if(currState.equals("request_send")){
                         cancelChatRequest();
@@ -343,6 +355,19 @@ public class ProfileActivity extends AppCompatActivity {
                                     });
                         }
                     }
+                });
+    }
+
+    private void addBot() {
+        contactsReference.child(senderUserID).child(recCurrUser)
+                .child(DB_CONTACTS_CONTACT).setValue(DB_CONTACTS_SAVED)
+                .addOnSuccessListener(aVoid -> {
+                    sendMessageReqBtn.setEnabled(true);
+                    currState = "friends";
+                    sendMessageReqBtn.setText("Remove Contact");
+
+                    declineMessageReqBtn.setVisibility(View.INVISIBLE);
+                    declineMessageReqBtn.setEnabled(false);
                 });
     }
 }

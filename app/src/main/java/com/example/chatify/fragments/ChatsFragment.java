@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.example.chatify.ChatActivity;
 import com.example.chatify.model.User;
 import com.example.chatify.R;
+import com.example.chatify.utils.AppSharedPreferences;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,8 +32,15 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.kommunicate.KmConversationBuilder;
+import io.kommunicate.Kommunicate;
+import io.kommunicate.users.KMUser;
+
+import static com.example.chatify.utils.AppConst.DB_USERS_TYPE_BOT;
+import static com.example.chatify.utils.AppConst.KOMMUNICATE_APP_ID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,6 +52,7 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
 
     private DatabaseReference chatsReference, userReference;
     private FirebaseAuth mAuth;
+    private User user;
     private String curruserID;
 
     private List<User> list;
@@ -65,13 +74,26 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
         curruserID = mAuth.getCurrentUser().getUid();
         chatsReference = FirebaseDatabase.getInstance().getReference().child("Contacts").child(curruserID);
         userReference = FirebaseDatabase.getInstance().getReference().child("User");
-
+        user = AppSharedPreferences.getUser(Objects.requireNonNull(getContext()));
         list = new ArrayList<>();
+
+        initBot();
 
         return privateChatsView;
     }
 
+    private void initBot() {
+        Kommunicate.init(getContext(), KOMMUNICATE_APP_ID);
 
+        KMUser kmUser = new KMUser();
+        kmUser.setUserId(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+        kmUser.setImageLink(user.getUser_Image());
+        kmUser.setDisplayName(user.getUser_Name());
+
+        new KmConversationBuilder(getContext())
+                .setKmUser(kmUser)
+                .launchConversation(null);
+    }
 
     @Override
     public void onStart() {
@@ -100,15 +122,16 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
                 userReference.child(userIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        User user = new User();
+
+//                      Toast.makeText(getContext(), "hi", Toast.LENGTH_SHORT).show();
 
                         if(dataSnapshot.exists()){
+                            User user = dataSnapshot.getValue(User.class);
                             if(dataSnapshot.hasChild("User_Image")){
                                 image[0] = dataSnapshot.child("User_Image").getValue().toString();
                                 Picasso.get().load(image[0]).placeholder(R.drawable.default_image).into(allUserViewHolder.userImage);
 
                                 user.setUser_Image(image[0]);
-
                             }
 
                             final String name = dataSnapshot.child("User_Name").getValue().toString();
@@ -120,6 +143,7 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
                             user.setUser_Name(name);
 
                             list.add(user);
+
 
                             if(dataSnapshot.child("User_State").hasChild("State"))
                             {
@@ -140,15 +164,14 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
                             }
 
 
-                            allUserViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
+                            allUserViewHolder.itemView.setOnClickListener(v -> {
+                                if (user.getUserType() != null && user.getUserType().equals(DB_USERS_TYPE_BOT)) {
+                                    startBot();
+                                } else {
                                     Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                     chatIntent.putExtra("visited_User_id", userIDs);
                                     chatIntent.putExtra("visited_User_name", name);
                                     chatIntent.putExtra("visited_User_image", image[0]);
-
-
                                     startActivity(chatIntent);
                                 }
                             });
@@ -168,6 +191,10 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
 
         chatsRecView.setAdapter(adapter);
         adapter.startListening();
+    }
+
+    private void startBot() {
+        Kommunicate.openConversation(getContext(), null, null);
     }
 
     @Override
