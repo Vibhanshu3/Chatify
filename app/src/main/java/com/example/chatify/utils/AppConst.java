@@ -22,6 +22,8 @@ public class AppConst {
 
     public static final String STORAGE_IMAGE_TYPE = ".jpg";
     public static final String STORAGE_COMMUNITY_IMAGE = "CommunityImage";
+    public static final String STORAGE_GROUP_IMAGE = "GroupImage";
+    public static final String STORAGE_GROUP_THUMB_IMAGE = "GroupThumbImage";
 
     public static final String LOG_MAIN = "mainActivity";
     public static final String LOG_LOGIN = "loginActivity";

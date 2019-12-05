@@ -1,8 +1,13 @@
 package com.example.chatify.activity;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -11,6 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +27,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -55,7 +63,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,12 +79,18 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static android.widget.Toast.LENGTH_SHORT;
 import static com.example.chatify.utils.AppConst.DB_CONTACTS_KEY;
 import static com.example.chatify.utils.AppConst.DB_GROUPS_ROLE_ADMIN;
 import static com.example.chatify.utils.AppConst.DB_GROUPS_ROLE_MEMBER;
 import static com.example.chatify.utils.AppConst.DB_USERS_GROUPS;
 import static com.example.chatify.utils.AppConst.DB_USERS_KEY;
+import static com.example.chatify.utils.AppConst.REQUEST_CODE_PERMISSION_STORAGE;
 
 //FixMe: check of user is null
 
@@ -82,10 +101,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @BindView(R.id.search_relative_layout)
     RelativeLayout relativeLayout;
 
+    private boolean permissionForActivity = false;
+
     private List<GroupMember> groupContacts;
 
+    private CircleImageView dialogImage;
     private EditText dialogGroupName;
+    private ProgressBar dialogLoader;
     private Dialog dialog;
+
+    private Uri uri;
+    private Bitmap bitmap;
 
     private FirebaseUser user;
     private DatabaseReference databaseReference;
@@ -271,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     Log.d("check", "onDataChange: " + "check");
 //                    Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "Go to settings", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Go to settings", LENGTH_SHORT).show();
                     sendUserToSettingActivity();
                 }
             }
@@ -325,40 +351,33 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
-
             case R.id.main_menu_search:
                 tag=1;
-                relativeLayout.setVisibility(View.VISIBLE);
+                relativeLayout.setVisibility(VISIBLE);
                 userRecView = findViewById(R.id.user_rec_view);
                 userRecView.setHasFixedSize(true);
                 searchAdapter = new SearchAdapter(MainActivity.this, list);
                 userRecView.setAdapter(searchAdapter);
                 userRecView.setLayoutManager(new LinearLayoutManager(this));
                 return true;
-
             case R.id.main_menu_logout:
                 logout();
                 updateUserStatus("Offline");
                 return true;
-
             case R.id.main_menu_account:
                 sendUserToSettingActivity();
                 flag = 1;
                 return true;
-
             case R.id.main_menu_Users:
                 Intent intent1 = new Intent(MainActivity.this, AllUserActivity.class);
                 startActivity(intent1);
                 flag = 1;
                 return true;
-
             case R.id.main_menu_Group:
                 addGroup();
                 flag = 1;
                 return true;
-
             default:
                 return false;
         }
@@ -367,10 +386,55 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        for (Fragment fragment : fragments) {
-            if(fragment instanceof CommunityFragment) {
-                fragment.onActivityResult(requestCode, resultCode, data);
+        if (permissionForActivity) {
+            permissionForActivity = false;
+            if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                if (resultCode == RESULT_OK) {
+                    CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                    if (result != null) {
+                        uri = result.getUri();
+                        File thumbUri = new File(uri.getPath());
+                        try {
+                            bitmap = new Compressor(this)
+                                    .setMaxWidth(200)
+                                    .setMaxHeight(200)
+                                    .setQuality(50)
+                                    .compressToBitmap(thumbUri);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Picasso.get().load(uri).into(dialogImage);
+                    }
+                }
+            }
+        } else {
+            List<Fragment> fragments = getSupportFragmentManager().getFragments();
+            for (Fragment fragment : fragments) {
+                if(fragment instanceof CommunityFragment) {
+                    fragment.onActivityResult(requestCode, resultCode, data);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (permissionForActivity) {
+            permissionForActivity = false;
+            if (requestCode == REQUEST_CODE_PERMISSION_STORAGE) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    addImage();
+                } else {
+                    Toast.makeText(this, "Permission denied", LENGTH_SHORT).show();
+                }
+            }
+        } else {
+            List<Fragment> fragments = getSupportFragmentManager().getFragments();
+            for (Fragment fragment : fragments) {
+                if(fragment instanceof CommunityFragment) {
+                    fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                }
             }
         }
     }
@@ -391,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         AuthUI.getInstance()
                 .signOut(this)
                 .addOnCompleteListener(task -> {
-                    Toast.makeText(MainActivity.this, "Sign Out", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Sign Out", LENGTH_SHORT).show();
                     Log.d("us", "onComplete: " + "logout");
                     sendUserToLoginActivity();
                 });
@@ -429,9 +493,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextChange(String newText) {
         if (newText.length() == 0) {
-            relativeLayout.setVisibility(View.GONE);
+            relativeLayout.setVisibility(GONE);
         } else {
-            relativeLayout.setVisibility(View.VISIBLE);
+            relativeLayout.setVisibility(VISIBLE);
             String userInput = newText.toLowerCase();
             Log.d("list", "onQueryTextChange: " + list);
             Log.d("userinput", "onQueryTextChange: " + userInput);
@@ -457,11 +521,21 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 dialog.dismiss();
                 break;
             case R.id.create:
-                presenter.createGroup(user.getUid(), dialogGroupName.getText().toString(), "", groupContacts);
+                dialogLoader.setVisibility(VISIBLE);
+                presenter.createGroup(user.getUid(), dialogGroupName.getText().toString(), uri, bitmap, groupContacts);
                 break;
             case R.id.dialog_add_group_icon:
-                //add image
-
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        permissionForActivity = true;
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_STORAGE);
+                    } else {
+                        addImage();
+                    }
+                } else {
+                    addImage();
+                }
+                break;
         }
     }
 
@@ -480,18 +554,19 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public void error(String error) {
-        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+        dialogLoader.setVisibility(GONE);
+        Toast.makeText(this, error, LENGTH_SHORT).show();
     }
 
     @Override
     public void groupAdded(Group group) {
+        dialogLoader.setVisibility(GONE);
         dialog.dismiss();
-        Toast.makeText(this, "goto chat screen", Toast.LENGTH_SHORT).show();
+        onGroupSelected(group);
     }
 
     @Override
     public void onGroupSelected(Group group) {
-        Toast.makeText(this, "goto chat screen", Toast.LENGTH_SHORT).show();
         Intent groupIntent = new Intent(MainActivity.this, GroupActivity.class);
         groupIntent.putExtra("group",new Gson().toJson(group));
         startActivity(groupIntent);
@@ -499,6 +574,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @OnClick(R.id.main_activity_add_group)
     public void addGroup() {
+        uri = null;
+        bitmap = null;
         groupContacts = new ArrayList<>();
         groupContacts.add(new GroupMember(user.getUid(), DB_GROUPS_ROLE_ADMIN));
 
@@ -512,9 +589,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         Objects.requireNonNull(window).setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         window.setBackgroundDrawableResource(android.R.color.transparent);
 
+        dialogLoader = dialog.findViewById(R.id.loader);
+        dialogImage = dialog.findViewById(R.id.dialog_add_group_icon);
         dialog.findViewById(R.id.cancel).setOnClickListener(this);
         dialog.findViewById(R.id.create).setOnClickListener(this);
-        dialog.findViewById(R.id.dialog_add_group_icon).setOnClickListener(this);
+        dialogImage.setOnClickListener(this);
 
         dialogGroupName = dialog.findViewById(R.id.dialog_add_group_name);
 
@@ -530,6 +609,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter.startListening();
 
         dialog.show();
+    }
+
+    private void addImage() {
+        permissionForActivity = true;
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(1, 1)
+                .start(this);
     }
 }
 
