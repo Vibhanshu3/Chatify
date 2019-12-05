@@ -294,11 +294,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         MenuItem menuItem1 = menu.findItem(R.id.main_menu_request);
 
+        if(user != null){
         databaseReference.child("Chat Request").child(currentUser)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         Log.d("badgecount", "onDataChange: " + dataSnapshot.getChildrenCount());
+
                         String count = String.valueOf(dataSnapshot.getChildrenCount());
                         if(!count.equals("0")) {
                             menuItem1.setActionView(R.layout.request_badge);
@@ -316,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
                     }
                 });
+        }
         return true;
     }
 
@@ -415,7 +418,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         databaseReference.child("User").child(user.getUid()).child("User_State")
                 .updateChildren(onlineState);
 
-
     }
 
     @Override
@@ -453,7 +455,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 break;
             case R.id.dialog_add_group_icon:
                 //add image
-
 
         }
     }

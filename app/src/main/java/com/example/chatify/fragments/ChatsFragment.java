@@ -100,9 +100,6 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
                 userReference.child(userIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-//                      Toast.makeText(getContext(), "hi", Toast.LENGTH_SHORT).show();
-
                         User user = new User();
 
                         if(dataSnapshot.exists()){
@@ -111,7 +108,6 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
                                 Picasso.get().load(image[0]).placeholder(R.drawable.default_image).into(allUserViewHolder.userImage);
 
                                 user.setUser_Image(image[0]);
-
 
                             }
 
@@ -124,7 +120,6 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
                             user.setUser_Name(name);
 
                             list.add(user);
-
 
                             if(dataSnapshot.child("User_State").hasChild("State"))
                             {

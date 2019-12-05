@@ -67,12 +67,12 @@ public class GroupProfileActivity extends AppCompatActivity {
         receivedGroupName = group.getGroupName();
 
         group_desc_toolbar.setTitle(receivedGroupName);
-      //  Picasso.get().load(group.getGroupImage()).placeholder(R.drawable.default_image).into(group_desc_imageview);
+        //  Picasso.get().load(group.getGroupImage()).placeholder(R.drawable.default_image).into(group_desc_imageview);
 
         memberReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(int i =0; i < dataSnapshot.getChildrenCount(); i++) {
+                for (int i = 0; i < dataSnapshot.getChildrenCount(); i++) {
                     memberReference.child(String.valueOf(i)).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -86,7 +86,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                                     Log.d("value", "onDataChange: " + userclass);
                                     members.add(userclass);
                                     Log.d("value", "members: " + members);
-                                   // groupProfileAdapter.updateList(members);
+                                    // groupProfileAdapter.updateList(members);
                                     groupProfileAdapter = new GroupProfileAdapter(GroupProfileActivity.this, members);
                                     memberList.setAdapter(groupProfileAdapter);
                                 }

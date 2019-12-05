@@ -145,7 +145,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 declineMessageReqBtn.setEnabled(false);
                             }
 
-                        }else{
+                        }else {
                             contactsReference.child(senderUserID)
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
@@ -302,7 +302,6 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     }
                 });
-
     }
 
     private void sendChatRequest() {
