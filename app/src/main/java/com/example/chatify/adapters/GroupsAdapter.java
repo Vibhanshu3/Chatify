@@ -51,7 +51,7 @@ public class GroupsAdapter extends FirebaseRecyclerAdapter<String, GroupsAdapter
 
                     if (group != null) {
                         viewHolder.groupName.setText(group.getGroupName());
-                        if (!group.getGroupImage().isEmpty()) {
+                        if (group.getGroupImage() != null && !group.getGroupImage().isEmpty()) {
                             Picasso.get().load(group.getGroupImage()).placeholder(R.drawable.default_image).into(viewHolder.groupImage);
                         }
                         viewHolder.container.setOnClickListener(v -> clickListener.onGroupSelected(group));
