@@ -79,6 +79,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @BindView(R.id.main_activity_navigation_groups)
     RecyclerView groupsRecyclerView;
 
+    @BindView(R.id.search_relative_layout)
+    RelativeLayout relativeLayout;
+
     private List<GroupMember> groupContacts;
 
     private EditText dialogGroupName;
@@ -105,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     List<String> list;
     private SearchAdapter searchAdapter;
-    private RelativeLayout relativeLayout;
 
     private RecyclerView userRecView;
     int tag =0;
@@ -152,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         user = mauth.getCurrentUser();
 
         list = new ArrayList<>();
-        relativeLayout = findViewById(R.id.search_relative_layout);
 
         if (user != null) {
             init();
@@ -425,19 +426,24 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        String userInput = newText.toLowerCase();
-        Log.d("list", "onQueryTextChange: " + list);
-        Log.d("userinput", "onQueryTextChange: " + userInput);
-        List<String> newList = new ArrayList<>();
+        if (newText.length() == 0) {
+            relativeLayout.setVisibility(View.GONE);
+        } else {
+            relativeLayout.setVisibility(View.VISIBLE);
+            String userInput = newText.toLowerCase();
+            Log.d("list", "onQueryTextChange: " + list);
+            Log.d("userinput", "onQueryTextChange: " + userInput);
+            List<String> newList = new ArrayList<>();
 
-        for(String names : list){
-            if(names.toLowerCase().contains(userInput)){
-                newList.add(names);
+            for(String names : list){
+                if(names.toLowerCase().contains(userInput)){
+                    newList.add(names);
+                }
             }
-        }
-        Log.d("newlist", "onQueryTextChange: " + newList);
+            Log.d("newlist", "onQueryTextChange: " + newList);
 
-        searchAdapter.updateList(newList);
+            searchAdapter.updateList(newList);
+        }
 
         return true;
     }

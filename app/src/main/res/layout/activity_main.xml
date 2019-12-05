@@ -5,7 +5,6 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".activity.MainActivity">
 
     <!-- FixMe: View pager bottom -->
@@ -33,26 +32,6 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-
-        <!--&lt;!&ndash;search rec view&ndash;&gt;-->
-        <RelativeLayout
-            android:id="@+id/search_relative_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:visibility="invisible"
-            android:background="@color/fui_bgAnonymous">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/user_rec_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                >
-
-            </androidx.recyclerview.widget.RecyclerView>
-        </RelativeLayout>
-
-
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/main_tabs_pager"
             android:layout_width="match_parent"
@@ -61,6 +40,22 @@
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         </androidx.viewpager.widget.ViewPager>
+
+        <!--&lt;!&ndash;search rec view&ndash;&gt;-->
+        <RelativeLayout
+            android:id="@+id/search_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:fitsSystemWindows="true"
+            android:visibility="invisible"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/user_rec_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
