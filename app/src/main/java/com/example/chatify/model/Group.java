@@ -8,16 +8,18 @@ public class Group  implements Serializable {
     private String createdBy;
     private String groupName;
     private String groupImage;
+    private String groupThumb;
     private List<GroupMember> members;
 
     public Group() {
     }
 
-    public Group(String groupId, String createdBy, String groupName, String groupImage, List<GroupMember> members) {
+    public Group(String groupId, String createdBy, String groupName, String groupImage, String groupThumb, List<GroupMember> members) {
         this.groupId = groupId;
         this.createdBy = createdBy;
         this.groupName = groupName;
         this.groupImage = groupImage;
+        this.groupThumb = groupThumb;
         this.members = members;
     }
 
@@ -59,5 +61,13 @@ public class Group  implements Serializable {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getGroupThumb() {
+        return groupThumb;
+    }
+
+    public void setGroupThumb(String groupThumb) {
+        this.groupThumb = groupThumb;
     }
 }
