@@ -1,5 +1,9 @@
 package com.example.chatify;
 
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,11 +11,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.ImageView;
-
-import com.example.chatify.Data.Messages;
 import com.example.chatify.adapters.GroupProfileAdapter;
 import com.example.chatify.model.Group;
 import com.example.chatify.model.User;
@@ -21,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class GroupProfileActivity extends AppCompatActivity {
 
         group_desc_imageview = findViewById(R.id.group_desc_image);
         memberList = findViewById(R.id.member_list);
-        members = new ArrayList<User>();
+        members = new ArrayList<>();
 
 
         //firebase
@@ -67,7 +67,9 @@ public class GroupProfileActivity extends AppCompatActivity {
         receivedGroupName = group.getGroupName();
 
         group_desc_toolbar.setTitle(receivedGroupName);
-        //  Picasso.get().load(group.getGroupImage()).placeholder(R.drawable.default_image).into(group_desc_imageview);
+        if(group.getGroupImage() != null && !group.getGroupImage().equals("")) {
+            Picasso.get().load(group.getGroupImage()).placeholder(R.drawable.default_image).into(group_desc_imageview);
+        }
 
         memberReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -86,7 +88,7 @@ public class GroupProfileActivity extends AppCompatActivity {
                                     Log.d("value", "onDataChange: " + userclass);
                                     members.add(userclass);
                                     Log.d("value", "members: " + members);
-                                    // groupProfileAdapter.updateList(members);
+                                   // groupProfileAdapter.updateList(members);
                                     groupProfileAdapter = new GroupProfileAdapter(GroupProfileActivity.this, members);
                                     memberList.setAdapter(groupProfileAdapter);
                                 }
