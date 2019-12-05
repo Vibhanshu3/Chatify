@@ -16,6 +16,7 @@
     <color name="light_blue_400">#29B6F6</color>
 
     <color name="colorPrimary1">#292b3d</color>
+    <color name="lightgray">#ededed</color>
     <color name="grey_light">#fafafa</color>
     <color name="start_blue">#09c6df</color>
     <color name="end_blue">#0bcce6</color>
