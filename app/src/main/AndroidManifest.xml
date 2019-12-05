@@ -16,21 +16,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".GroupProfileActivity" />
         <activity android:name=".RequestActivity">
             <intent-filter>
-                <action android:name="RequestActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="RequestActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".GroupProfileActivity" />
-        <activity android:name=".Community.Prof.ProfActivity" />
-        <activity android:name=".Community.Share.ShareActivity" />
-        <activity android:name=".Community.Like.LikeActivity" />
-        <activity android:name=".Community.Search.SearchActivity" />
-        <activity android:name=".Community.Home.HomeActivity" />
         <activity android:name=".StoryActivity" />
         <activity android:name=".AddStoryActivity" />
-
         <activity
             android:name=".GroupActivity"
             android:parentActivityName=".activity.MainActivity" />
@@ -39,8 +33,7 @@
             android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".ChatActivity"
-            android:parentActivityName=".activity.MainActivity" >
-        </activity>
+            android:parentActivityName=".activity.MainActivity" />
         <activity android:name=".ProfileActivity" />
         <activity
             android:name=".AllUserActivity"

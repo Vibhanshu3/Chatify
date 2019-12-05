@@ -8,6 +8,7 @@ public class User {
     private String User_Image;
     private String User_Status;
     private String User_Thumb_Image;
+    private String userType;
     private UserState User_State;
     private List<String> groups;
     private List<String> posts;
@@ -87,6 +88,14 @@ public class User {
 
     public void setPosts(List<String> posts) {
         this.posts = posts;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 }
 

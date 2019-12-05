@@ -7,6 +7,7 @@ public class AppConst {
     public static final String DB_USERS_TOKEN = "Device_Token";
     public static final String DB_USERS_GROUPS = "groups";
     public static final String DB_USERS_POSTS = "posts";
+    public static final String DB_USERS_TYPE_BOT = "bot";
     public static final String DB_USERS_STATE_ONLINE = "Online";
 
     public static final String DB_CONTACTS_KEY = "Contacts";
@@ -20,6 +21,9 @@ public class AppConst {
     public static final String DB_GROUPS_ROLE_ADMIN = "Admin";
     public static final String DB_GROUPS_ROLE_MEMBER = "Member";
 
+    public static final String DB_CONTACTS_CONTACT = "Contacts";
+    public static final String DB_CONTACTS_SAVED = "Saved";
+
     public static final String STORAGE_IMAGE_TYPE = ".jpg";
     public static final String STORAGE_COMMUNITY_IMAGE = "CommunityImage";
     public static final String STORAGE_GROUP_IMAGE = "GroupImage";
@@ -31,4 +35,6 @@ public class AppConst {
 
     static final String PREF_FILE = "appPref";
     static final String PREF_USER = "user";
+
+    public static final String KOMMUNICATE_APP_ID = "33d55a9f8368f68ce8ef57ffc9c0448ff";
 }
