@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,8 @@ public class GroupProfileActivity extends AppCompatActivity {
         receivedGroupName = group.getGroupName();
 
         group_desc_toolbar.setTitle(receivedGroupName);
-      //  Picasso.get().load(group.getGroupImage()).placeholder(R.drawable.default_image).into(group_desc_imageview);
+        if(!group.getGroupImage().equals(""))
+             Picasso.get().load(group.getGroupImage()).placeholder(R.drawable.default_image).into(group_desc_imageview);
 
         memberReference.addValueEventListener(new ValueEventListener() {
             @Override

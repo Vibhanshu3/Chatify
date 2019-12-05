@@ -133,7 +133,8 @@ public class GroupActivity extends AppCompatActivity {
         messageInputText = findViewById(R.id.input_msg);
 
         groupName.setText(receivedGroupName);
-      //  Picasso.get().load(receivedGroupImage).placeholder(R.drawable.default_image).into(groupImage);
+        if(!receivedGroupImage.equals(""))
+            Picasso.get().load(receivedGroupImage).placeholder(R.drawable.default_image).into(groupImage);
 
         //firebase database.
         databaseReference = FirebaseDatabase.getInstance().getReference();
