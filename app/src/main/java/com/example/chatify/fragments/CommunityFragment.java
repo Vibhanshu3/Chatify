@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -83,7 +84,8 @@ public class CommunityFragment extends Fragment implements CommunityView, View.O
     ProgressBar loader;
 
     @BindView(R.id.community_trending_post)
-    Button trendingButton;
+    CardView trendingButton;
+
 
     private boolean trending = false;
 
@@ -331,13 +333,13 @@ public class CommunityFragment extends Fragment implements CommunityView, View.O
             query.removeEventListener(this);
             query = postsRef;
             query.addValueEventListener(this);
-            trendingButton.setText(R.string.trending);
+            ;
         } else {
             trending = true;
             query.removeEventListener(this);
             query = postsRef.orderByChild(DB_POSTS_LIKE_COUNT);
             query.addValueEventListener(this);
-            trendingButton.setText(R.string.latest);
+            ;
         }
     }
 
