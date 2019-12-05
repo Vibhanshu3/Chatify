@@ -2,7 +2,13 @@ package com.example.chatify.adapters;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +43,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     String currUser;
 
-    public MessageAdapter(List<Messages> userMessagesList){
+    public MessageAdapter(List<Messages> userMessagesList) {
         this.userMessagesList = userMessagesList;
 
     }
@@ -106,11 +112,24 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 holder.senderText.setBackgroundResource(R.drawable.sender_messages_layout);
                 holder.senderText.setTextColor(Color.BLACK);
 
-                if(messages.getMessageType() == "group"){
-                    holder.senderText.setText(messages.getFromName() +"\n" + messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+                if (messages.getMessageType() == "group") {
+                    String str = messages.getFromName() + "\n" + messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate();
+                    int strLen = str.length();
+                    SpannableString ss1 = new SpannableString(str);
+                    ss1.setSpan(new RelativeSizeSpan(0.7f), strLen - 22, strLen, 0);
+//                    ss1.setSpan(new StyleSpan(Typeface.NORMAL), strLen - 22, strLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                }else {
-                    holder.senderText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+                    holder.senderText.setText(ss1);
+
+                } else {
+                    String str = messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate();
+                    Log.d("stringss", "onBindViewHolder: " + str );
+
+                    int strLen = str.length();
+                    SpannableString ss1 = new SpannableString(str);
+                    ss1.setSpan(new RelativeSizeSpan(0.7f), strLen - 22, strLen, 0);
+                    holder.senderText.setText(ss1);
+
                 }
             } else {
                 Log.d("inrec", "onBindViewHolder: " + "text");
@@ -120,14 +139,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 holder.receiverText.setBackgroundResource(R.drawable.receiver_messages_layout);
                 holder.receiverText.setTextColor(Color.BLACK);
-                if(messages.getMessageType() == "group"){
-                    holder.receiverText.setText(messages.getFromName() +"\n" + messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+                if (messages.getMessageType() == "group") {
 
-                }else {
-                    holder.receiverText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+                    String str = messages.getFromName() + "\n" + messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate();
+                    int strLen = str.length();
+                    SpannableString ss1 = new SpannableString(str);
+                    ss1.setSpan(new RelativeSizeSpan(0.7f), strLen - 22, strLen, 0);
+                    holder.receiverText.setText(ss1);
+
+                } else {
+                    String str = messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate();
+                    int strLen = str.length();
+                    SpannableString ss1 = new SpannableString(str);
+                    ss1.setSpan(new RelativeSizeSpan(0.7f), strLen - 22, strLen, 0);
+                    holder.receiverText.setText(ss1);
                 }
             }
-        } else if(fromMesstype.equals("image")) {
+        } else if (fromMesstype.equals("image")) {
             holder.receiverText.setVisibility(View.INVISIBLE);
             holder.userImage.setVisibility(View.INVISIBLE);
             holder.senderText.setVisibility(View.INVISIBLE);
@@ -141,7 +169,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 holder.messageSenderPicture.setVisibility(View.VISIBLE);
                 Picasso.get().load(messages.getMessage()).into(holder.messageSenderPicture);
 
-            }else{
+            } else {
                 Log.d("inrec", "onBindViewHolder: " + "inrec");
 
                 holder.messageReceiverPicture.setVisibility(View.VISIBLE);
@@ -149,7 +177,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 Picasso.get().load(messages.getMessage()).placeholder(R.drawable.profile_image).into(holder.messageReceiverPicture);
 
             }
-        }else {
+        } else {
             if (fromUserId.equals(currUser)) {
                 holder.messageSenderPicture.setVisibility(View.VISIBLE);
                 holder.messageSenderPicture.setBackgroundResource(R.drawable.file);
@@ -163,7 +191,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     }
                 });
 
-            }else{
+            } else {
                 holder.messageReceiverPicture.setVisibility(View.VISIBLE);
                 holder.messageSenderPicture.setVisibility(View.VISIBLE);
 
@@ -187,13 +215,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return userMessagesList.size();
     }
 
-    public  class MessageViewHolder extends RecyclerView.ViewHolder{
+    public class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView receiverText,senderText;
+        public TextView receiverText, senderText;
         public CircleImageView userImage;
         public ImageView messageSenderPicture, messageReceiverPicture;
 
-        public MessageViewHolder(View view){
+        public MessageViewHolder(View view) {
 
             super(view);
 

@@ -64,7 +64,7 @@ public class ChatActivity extends AppCompatActivity {
     private EditText messageInputText;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReference, notificationReference;
 
 
     private List<Messages> messageList = new ArrayList<>();
@@ -121,6 +121,7 @@ public class ChatActivity extends AppCompatActivity {
 
         //firebase database.
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        notificationReference = FirebaseDatabase.getInstance().getReference().child("Notification");
         mAuth = FirebaseAuth.getInstance();
         messageSenderID = mAuth.getCurrentUser().getUid();
 
@@ -323,6 +324,8 @@ public class ChatActivity extends AppCompatActivity {
                                         Toast.makeText(ChatActivity.this, "Image sent successfully", Toast.LENGTH_SHORT).show();
                                         loadingBar.dismiss();
 
+                                        sendNotification();
+
                                     } else {
                                         Toast.makeText(ChatActivity.this, "error", Toast.LENGTH_SHORT).show();
                                         loadingBar.dismiss();
@@ -399,6 +402,9 @@ public class ChatActivity extends AppCompatActivity {
                                         Toast.makeText(ChatActivity.this, "Image sent successfully", Toast.LENGTH_SHORT).show();
                                         loadingBar.dismiss();
 
+                                        //notification
+                                        sendNotification();
+
                                     } else {
                                         Toast.makeText(ChatActivity.this, "error", Toast.LENGTH_SHORT).show();
                                         loadingBar.dismiss();
@@ -406,7 +412,6 @@ public class ChatActivity extends AppCompatActivity {
                                     }
                                 }
                             });
-
                         }
                     }
                 });
@@ -418,6 +423,22 @@ public class ChatActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    private void sendNotification() {
+        HashMap<String, String> chatNotification = new HashMap<>();
+        chatNotification.put("From", messageSenderID);
+        chatNotification.put("type", "message");
+
+        notificationReference.child(messageReceiverID).push()
+                .setValue(chatNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    //
+                }
+            }
+        });
     }
 
     private void displayLastSeen() {
@@ -552,6 +573,21 @@ public class ChatActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task task) {
                     if (task.isSuccessful()) {
                         Toast.makeText(ChatActivity.this, "message sent successfully", Toast.LENGTH_SHORT).show();
+
+//                        HashMap<String, String> chatNotification = new HashMap<>();
+//                        chatNotification.put("From", messageSenderID);
+//                        chatNotification.put("type", "message");
+//
+//                        notificationReference.child(messageReceiverID).push()
+//                                .setValue(chatNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<Void> task) {
+//                                if(task.isSuccessful()){
+//
+//                                }
+//                            }
+//                        });
+                        sendNotification();
 
                     } else {
                         Toast.makeText(ChatActivity.this, "error", Toast.LENGTH_SHORT).show();

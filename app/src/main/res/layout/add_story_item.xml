@@ -23,6 +23,8 @@
             android:id="@+id/story_plus"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="40dp"
             android:src="@drawable/add_story"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"/>
@@ -31,8 +33,8 @@
 
     <TextView
         android:id="@+id/addstory_text"
-        android:text="Add Post"
-        android:textColor="@android:color/white"
+        android:text="Add Story"
+        android:textColor="@android:color/black"
         android:layout_gravity="center"
         android:maxLines="1"
         android:textSize="15sp"

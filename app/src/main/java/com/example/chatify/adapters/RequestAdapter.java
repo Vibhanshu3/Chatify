@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -148,21 +149,28 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
             requestViewHolder.userName.setText(name);
             requestViewHolder.userStatus.setText("Your req has been send");
+            Log.d("removed", "onComplete: " + "remove");
 
             requestViewHolder.accept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.d("removec", "onComplete: " + "remove");
+
                     chatRequestReference.child(currUserID).child(requestModel.getUserId()).removeValue()
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
+                                        Log.d("removeb", "onComplete: " + "remove");
+
                                         chatRequestReference.child(requestModel.getUserId()).child(currUserID).removeValue()
                                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                         if (task.isSuccessful()) {
-                                                            //Toast.makeText(getContext(), "Contact Request Declined", Toast.LENGTH_SHORT).show();
+
+                                                            Log.d("remove", "onComplete: " + "remove");
+                                                           // Toast.makeText(getContext(), "Contact Request Declined", Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
                                                 });

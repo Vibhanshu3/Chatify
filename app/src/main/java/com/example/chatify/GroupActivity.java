@@ -27,8 +27,10 @@ import android.widget.Toast;
 //import com.example.chatify.Adapters.MessageAdapter;
 import com.example.chatify.Data.Messages;
 import com.example.chatify.activity.MainActivity;
+import com.example.chatify.adapters.GroupProfileAdapter;
 import com.example.chatify.adapters.MessageAdapter;
 import com.example.chatify.model.Group;
+import com.example.chatify.model.User;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -71,8 +73,7 @@ public class GroupActivity extends AppCompatActivity {
     private EditText messageInputText;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference databaseReference;
-    private DatabaseReference groupReference;
+    private DatabaseReference databaseReference, groupReference, notificatioReference;
 
     private List<Messages> messageList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
@@ -91,6 +92,8 @@ public class GroupActivity extends AppCompatActivity {
     private FloatingActionButton fab_pdf;
     private Boolean isFABOpen;
 
+    private List<String> groupMembers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 //        ButterKnife.bind(this);
@@ -101,6 +104,7 @@ public class GroupActivity extends AppCompatActivity {
         group = new Gson().fromJson(getIntent().getStringExtra("group"), Group.class);
         receivedGroupImage = group.getGroupImage();
         receivedGroupName = group.getGroupName();
+        groupMembers = new ArrayList<>();
 
         //toolbar.
         chatToolbar = findViewById(R.id.chat_toolbar);
@@ -138,6 +142,7 @@ public class GroupActivity extends AppCompatActivity {
         //firebase database.
         databaseReference = FirebaseDatabase.getInstance().getReference();
         groupReference = FirebaseDatabase.getInstance().getReference().child("Groups");
+        notificatioReference = FirebaseDatabase.getInstance().getReference().child("Notification");
         mAuth = FirebaseAuth.getInstance();
         messageSenderID = mAuth.getCurrentUser().getUid();
         databaseReference.child("User").child(messageSenderID).addValueEventListener(new ValueEventListener() {
@@ -151,6 +156,8 @@ public class GroupActivity extends AppCompatActivity {
 
             }
         });
+        getMembers();
+
 
         //date and time.
         Calendar calender = Calendar.getInstance();
@@ -188,6 +195,7 @@ public class GroupActivity extends AppCompatActivity {
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                         }
+
                         if (which == 1) {
                             checker = "pdf";
 
@@ -385,7 +393,6 @@ public class GroupActivity extends AppCompatActivity {
                     }
                 });
 
-
             } else if (checker.equals("image")) {
                 Log.d("inimage", "onActivityResult: " + "inimage");
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference()
@@ -537,6 +544,22 @@ public class GroupActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Toast.makeText(GroupActivity.this, "message sent successfully", Toast.LENGTH_SHORT).show();
 
+                        for(int i = 0; i < groupMembers.size(); i++) {
+                            Log.d("notification_list", "onComplete: " + groupMembers.get(i));
+                            HashMap<String, String> chatNotification = new HashMap<>();
+                            chatNotification.put("From", messageSenderID);
+                            chatNotification.put("type", "message");
+
+                            notificatioReference.child(groupMembers.get(i)).push()
+                                    .setValue(chatNotification).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        //
+                                    }
+                                }
+                            });
+                        }
                     } else {
                         Toast.makeText(GroupActivity.this, "error", Toast.LENGTH_SHORT).show();
 
@@ -546,6 +569,33 @@ public class GroupActivity extends AppCompatActivity {
                 }
             });
         }
+    }
 
+    private void getMembers() {
+        groupReference.child(group.getGroupId()).child("members").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (int i = 0; i < dataSnapshot.getChildrenCount(); i++) {
+                    groupReference.child(group.getGroupId()).child("members").child(String.valueOf(i)).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            String user = dataSnapshot.child("member").getValue().toString();
+
+                            groupMembers.add(user);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }
